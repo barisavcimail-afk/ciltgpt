@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "C:\\Progra~1\\nodejs\\node.exe server.js",
-    "start": "C:\\Progra~1\\nodejs\\node.exe server.js",
+    "dev": "node server.js",
+    "start": "node server.js",
     "seed": "tsx prisma/seed.ts",
-    "build": "C:\\Progra~1\\nodejs\\node.exe --check server.js && C:\\Progra~1\\nodejs\\node.exe --check src/app.js && C:\\Progra~1\\nodejs\\node.exe --check src/components/pages.browser.js && C:\\Progra~1\\nodejs\\node.exe --check src/components/adminPages.browser.js && C:\\Progra~1\\nodejs\\node.exe --check src/components/analysisWizard.browser.js"
+    "build": "node --check server.js && node --check src/app.js && node --check src/components/pages.browser.js && node --check src/components/adminPages.browser.js && node --check src/components/analysisWizard.browser.js"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",

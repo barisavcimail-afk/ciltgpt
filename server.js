@@ -2849,7 +2849,7 @@ function safePath(pathname) {
   return join(root, cleanPath);
 }
 
-const server = createServer(async (req, res) => {
+export async function handleRequest(req, res) {
   const url = new URL(req.url || "/", `http://localhost:${port}`);
   const pathname = decodeURIComponent(url.pathname);
   const srcIndex = pathname.indexOf("/src/");
@@ -2941,7 +2941,9 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, { "Content-Type": contentTypes[".html"] });
     res.end(app);
   }
-});
+}
+
+const server = createServer(handleRequest);
 
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {
@@ -2952,7 +2954,9 @@ server.on("error", (error) => {
   throw error;
 });
 
-server.listen(port, () => {
-  console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
-});
+if (!process.env.VERCEL) {
+  server.listen(port, () => {
+    console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
+  });
+}
 
