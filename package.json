@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
+    "postinstall": "prisma generate",
     "seed": "tsx prisma/seed.ts",
     "build": "node --check server.js && node --check src/app.js && node --check src/components/pages.browser.js && node --check src/components/adminPages.browser.js && node --check src/components/analysisWizard.browser.js"
   },
