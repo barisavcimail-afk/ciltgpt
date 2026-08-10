@@ -1,0 +1,71 @@
+(function () {
+  window.CiltGPTReports = {
+    aiComment:
+      "Analiz sonucuna göre ciltte nem dengesi orta seviyede, leke görünümü belirgin ve hassasiyet eğilimi yüksektir. Cilt bariyerini destekleyen, leke görünümünü azaltmaya yardımcı ve düzenli SPF kullanımını içeren bir bakım protokolü önerilir.",
+    reports: [
+      {
+        id: "mock-report-001",
+        customerId: "ayse-yilmaz",
+        customerName: "Ayşe Yılmaz",
+        age: 34,
+        analysisDate: "2026-06-24",
+        overallScore: 72,
+        skinType: "Karma",
+        complaint: "Leke",
+        status: "Rapor hazır",
+        salonNote: "İlk 3 seansta bariyer desteği ve nem takibi önerilir.",
+        scores: {
+          Nem: 68,
+          Leke: 54,
+          Gözenek: 61,
+          Kırışıklık: 48,
+          Hassasiyet: 73,
+        },
+      },
+      {
+        id: "mock-report-002",
+        customerId: "elif-demir",
+        customerName: "Elif Demir",
+        age: 29,
+        analysisDate: "2026-06-18",
+        overallScore: 81,
+        skinType: "Kuru",
+        complaint: "Kuruluk",
+        status: "Rapor hazır",
+        salonNote: "Nem bariyeri desteklenmeli ve gece bakımı düzenli takip edilmeli.",
+        scores: {
+          Nem: 74,
+          Leke: 82,
+          Gözenek: 76,
+          Kırışıklık: 79,
+          Hassasiyet: 69,
+        },
+      },
+      {
+        id: "mock-report-003",
+        customerId: "zeynep-kaya",
+        customerName: "Zeynep Kaya",
+        age: 41,
+        analysisDate: "2026-06-12",
+        overallScore: 65,
+        skinType: "Hassas",
+        complaint: "Hassasiyet",
+        status: "Analiz bekliyor",
+        salonNote: "Cilt toleransı gözlenerek düşük yoğunluklu başlangıç önerilir.",
+        scores: {
+          Nem: 61,
+          Leke: 66,
+          Gözenek: 64,
+          Kırışıklık: 58,
+          Hassasiyet: 52,
+        },
+      },
+    ],
+    protocol: {
+      name: "HydraCare Leke ve Nem Dengeleme Protokolü",
+      sessions: 6,
+      frequency: "Haftada 1",
+      salonNote: "İlk 3 seansta bariyer desteği ve nem takibi önerilir.",
+    },
+  };
+})();

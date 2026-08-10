@@ -1,0 +1,205 @@
+﻿CiltGPT ?r?n A?ac?
+Toplam ?r?n: 45
+Olu?turma tarihi: 30.07.2026 11:19:55
+
+DenizCare
+  Güneş Koruyucu
+    - ?r?n ad?: Deniz Sun Care
+      ?zelli?i: Koruyucu
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Tonik
+    - ?r?n ad?: Deniz Tonik
+      ?zelli?i: Temizleme
+      Kullan?m ?ekli: Akşam
+
+
+HedraCare
+  Güneş Kremi
+    - ?r?n ad?: BB BLOCK
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: SUN SHİELD
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Maske
+    - ?r?n ad?: AGE DEFY MASK
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: HYDRA BOOST MASK
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: PURE BALANCE MASK
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Nemlendirici/Krem
+    - ?r?n ad?: AGE DEFY CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: AGE DEFY CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: EYE RENEW CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: HYDRATİON BOOST CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: HYDRATİON BOOST CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: NİGHT LUME
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: POWER RETİNOL CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: PURE BALANCE CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: PURE BALANCE CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Ozon
+    - ?r?n ad?: 03 ELİXİR
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Peeling
+    - ?r?n ad?: BODY SCRUB
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: RADİANT SCRUB
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: RADİANT SCRUB
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Saç Bakım
+    - ?r?n ad?: HAİR SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: HAİR SHAMPOO
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Selülit
+    - ?r?n ad?: FİRMİNG
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Serum
+    - ?r?n ad?: AHA+BHA PEEL SOLUTION
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: C VİT SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: COLLAGEN SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: HYALURONİC ASİD SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: NIACINAMIDE SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: RETİNOL SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: SEBUM BALANCİNG SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: SOMON DNA SERUM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Temizleyici
+    - ?r?n ad?: CLEAR BALANCE
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: GENTLE TOUCH CLEANSER
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: GENTLE TOUCH CLEANSER
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: OXYGEN BUBBLE CLEANSER
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: PURE MİLK CLEANSER
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+    - ?r?n ad?: PURE MİLK CLENASER
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Tonik
+    - ?r?n ad?: CALM BALANCE TONİC
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: CALM BALANCE TONİC
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: PURE BALANCE TONİC
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+    - ?r?n ad?: PURE BALANCE TONİC
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+  Vücut Beyazlatma
+    - ?r?n ad?: RADİANT BODY CREAM
+      ?zelli?i: Hassasiyet
+      Kullan?m ?ekli: Akşam
+
+
+OsmanCare
+  Güneş Koruyucusu
+    - ?r?n ad?: Osman Güneş koruyucusu
+      ?zelli?i: Koruyucu
+      Kullan?m ?ekli: Sabah/Akşam
+
+  Krem
+    - ?r?n ad?: Osman gece bakım kremi
+      ?zelli?i: Nemlendirici
+      Kullan?m ?ekli: akşam
+
+  Temizleme
+    - ?r?n ad?: Osman Pelling
+      ?zelli?i: Temizleyici
+      Kullan?m ?ekli: Akşam
+

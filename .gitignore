@@ -1,0 +1,15 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+.next/
+dist/
+build/
+.npm-cache/
+server*.log
+*.log
+.codex/
+.agents/
+.codex-checkpoints/
+checkpoints/
+*.rar

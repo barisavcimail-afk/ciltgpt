@@ -1,0 +1,132 @@
+(function () {
+  window.CiltGPTData = {
+    customers: [
+      {
+        id: "ayse-yilmaz",
+        fullName: "Ayşe Yılmaz",
+        phone: "0532 111 22 33",
+        age: 34,
+        gender: "Kadın",
+        firstRegistrationDate: "2026-05-20",
+        lastAnalysisDate: "2026-07-01",
+        status: "Aktif",
+        notes: "Nem dengesi takip ediliyor.",
+        crm: {
+          lastScore: 72,
+          skinType: "Karma",
+          complaint: "Leke",
+          sensitivity: "Takip gerekiyor",
+          spf: "Hayır",
+          routine: "Evet",
+          badges: ["Aktif", "Ürün yenileme zamanı", "Yeni analiz önerilir"],
+          recommendedProducts: [
+            {
+              productName: "HydraCare SPF 50",
+              recommendedDate: "2026-06-24",
+              purpose: "SPF koruması",
+              renewalEstimate: "30 gün",
+              status: "Ürün yenileme zamanı",
+            },
+            {
+              productName: "HydraCare Barrier Serum",
+              recommendedDate: "2026-06-24",
+              purpose: "Bariyer onarımı",
+              renewalEstimate: "45 gün",
+              status: "Takip gerekiyor",
+            },
+            {
+              productName: "HydraCare Night Repair Cream",
+              recommendedDate: "2026-06-24",
+              purpose: "Nem desteği",
+              renewalEstimate: "60 gün",
+              status: "Aktif",
+            },
+          ],
+          reminders: [
+            { title: "Kontrol randevusu", detail: "7 gün içinde kontrol önerilir", status: "Takip gerekiyor" },
+            { title: "Ürün yenileme zamanı", detail: "HydraCare SPF 50 yenileme zamanı", status: "Ürün yenileme zamanı" },
+            { title: "Yeni analiz önerisi", detail: "30 gün içinde yeni analiz planlanabilir", status: "Yeni analiz önerilir" },
+          ],
+          whatsappMessage:
+            "Merhaba Ayşe Hanım, cilt analiziniz sonrası önerilen ev devam ürünlerinizin kullanım süresi dolmak üzere. Kontrol ve ürün yenileme için salonumuza bekleriz.",
+        },
+      },
+      {
+        id: "elif-demir",
+        fullName: "Elif Demir",
+        phone: "0543 222 33 44",
+        age: 29,
+        gender: "Kadın",
+        firstRegistrationDate: "2026-05-28",
+        lastAnalysisDate: "2026-06-24",
+        status: "Takipte",
+        notes: "Leke protokolü planlandı.",
+        crm: {
+          lastScore: 81,
+          skinType: "Kuru",
+          complaint: "Kuruluk",
+          sensitivity: "Aktif",
+          spf: "Evet",
+          routine: "Hayır",
+          badges: ["Takip gerekiyor", "Yeni analiz önerilir"],
+          recommendedProducts: [],
+          reminders: [
+            { title: "Kontrol randevusu", detail: "Kontrol analizi önerilir", status: "Yeni analiz önerilir" },
+          ],
+          whatsappMessage:
+            "Merhaba Elif Hanım, kontrol analizi zamanınız yaklaştı. Cilt bakım planınızı güncellemek için salonumuza bekleriz.",
+        },
+      },
+      {
+        id: "zeynep-kaya",
+        fullName: "Zeynep Kaya",
+        phone: "0554 333 44 55",
+        age: 41,
+        gender: "Kadın",
+        firstRegistrationDate: "2026-04-18",
+        lastAnalysisDate: "2026-06-10",
+        status: "Aktif",
+        notes: "Hassasiyet nedeniyle düşük yoğunluk önerildi.",
+        crm: {
+          lastScore: 65,
+          skinType: "Hassas",
+          complaint: "Hassasiyet",
+          sensitivity: "Takip gerekiyor",
+          spf: "Hayır",
+          routine: "Evet",
+          badges: ["Aktif", "Takip gerekiyor"],
+          recommendedProducts: [],
+          reminders: [
+            { title: "Kontrol randevusu", detail: "Takip randevusu bekliyor", status: "Takip gerekiyor" },
+          ],
+          whatsappMessage:
+            "Merhaba Zeynep Hanım, hassasiyet takibi için kontrol randevunuzu planlayabiliriz.",
+        },
+      },
+    ],
+    followUpCustomers: [
+      { customerId: "ayse-yilmaz", name: "Ayşe Yılmaz", reason: "SPF yenileme zamanı" },
+      { customerId: "elif-demir", name: "Elif Demir", reason: "Kontrol analizi önerilir" },
+      { customerId: "zeynep-kaya", name: "Zeynep Kaya", reason: "Takip randevusu bekliyor" },
+    ],
+    mockReportId: "mock-report-001",
+    mockScores: {
+      "Genel cilt skoru": 72,
+      Nem: 68,
+      Leke: 54,
+      Gözenek: 61,
+      Kırışıklık: 48,
+      Hassasiyet: 73,
+    },
+    mockProtocol: {
+      name: "HydraCare Cilt Bakım Protokolü",
+      sessions: 6,
+      frequency: "Haftada 1",
+    },
+    mockHomeCareProducts: [
+      "HydraCare Cleanser",
+      "HydraCare Serum",
+      "HydraCare SPF 50",
+    ],
+  };
+})();

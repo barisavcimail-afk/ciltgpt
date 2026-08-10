@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  SALON_OWNER
+  SALON_STAFF
+  FIRM
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
+  UNSPECIFIED
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  TRIAL
+}
+
+enum PromoCodeStatus {
+  ACTIVE
+  USED
+  CANCELLED
+}
+
+model Salon {
+  id        String   @id @default(cuid())
+  name      String
+  ownerName String
+  email     String   @unique
+  phone     String
+  city      String
+  address   String
+  logoUrl   String?
+  reportSalonName String?
+  whatsapp String?
+  reportFooter String?
+  createdByFirmId String?
+  createdByUserId String?
+  defaultProtocol String?
+  defaultSessionCount Int?
+  defaultControlPeriod String?
+  activeProductsOnly Boolean @default(true)
+  notifyAnalysisDone Boolean @default(true)
+  notifyControlTime Boolean @default(true)
+  notifyProductRenewal Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  customers    Customer[]
+  analyses     Analysis[]
+  reports      Report[]
+  subscription Subscription?
+  teamMembers  TeamMember[]
+  protocols    Protocol[]
+  salonProducts SalonProduct[]
+  usedPromoCodes FirmPromoCode[]
+  createdByFirm Firm? @relation("FirmCreatedSalons", fields: [createdByFirmId], references: [id], onDelete: SetNull)
+  createdByUser User? @relation("UserCreatedSalons", fields: [createdByUserId], references: [id], onDelete: SetNull)
+}
+
+model User {
+  id           String   @id @default(cuid())
+  salonId      String?
+  firmId       String?
+  name         String
+  email        String   @unique
+  username     String?  @unique
+  passwordHash String?
+  staffRole    String?
+  role         UserRole
+  createdAt    DateTime @default(now())
+
+  salon Salon? @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  firm  Firm?  @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  createdSalons Salon[] @relation("UserCreatedSalons")
+}
+
+model Firm {
+  id        String   @id @default(cuid())
+  name      String
+  brandName String
+  email     String   @unique
+  phone     String?
+  website   String?
+  address   String?
+  logoUrl   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  products Product[]
+  createdSalons Salon[] @relation("FirmCreatedSalons")
+  analysisBalance FirmAnalysisBalance?
+  analysisSales FirmAnalysisSale[]
+  promoCodes FirmPromoCode[]
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  salonId   String
+  fullName  String
+  phone     String
+  age       Int?
+  gender    Gender   @default(UNSPECIFIED)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  salon    Salon      @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  analyses Analysis[]
+}
+
+model Analysis {
+  id              String         @id @default(cuid())
+  salonId         String
+  customerId      String
+  status          AnalysisStatus @default(PENDING)
+  skinType        String?
+  mainConcern     String?
+  consentAccepted Boolean        @default(false)
+  photos          Json?
+  createdAt       DateTime       @default(now())
+
+  salon    Salon     @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  customer Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  report   Report?
+}
+
+model Report {
+  id                 String   @id @default(cuid())
+  analysisId         String   @unique
+  salonId            String
+  overallScore       Int
+  hydrationScore     Int
+  pigmentationScore  Int
+  poreScore          Int
+  wrinkleScore       Int
+  sensitivityScore   Int
+  aiComment          String
+  rawAiResponse      Json?
+  recommendedProtocol Json?
+  recommendedProducts Json?
+  createdAt          DateTime @default(now())
+
+  analysis Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  salon    Salon    @relation(fields: [salonId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  firmId       String?
+  name         String
+  brand        String
+  category     String
+  usagePurpose String
+  usageTime    String
+  isActive     Boolean  @default(true)
+  isCabinProduct Boolean @default(false)
+  createdAt    DateTime @default(now())
+
+  firm          Firm? @relation(fields: [firmId], references: [id], onDelete: SetNull)
+  salonProducts SalonProduct[]
+}
+
+model SalonProduct {
+  id        String   @id @default(cuid())
+  salonId   String
+  productId String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  salon   Salon   @relation(fields: [salonId], references: [id], onDelete: Cascade)
+  product Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([salonId, productId])
+}
+
+model Subscription {
+  id           String             @id @default(cuid())
+  salonId      String             @unique
+  packageName  String
+  monthlyLimit Int
+  currentUsage Int                @default(0)
+  renewalDate  DateTime
+  status       SubscriptionStatus @default(ACTIVE)
+
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
+}
+
+model PackagePlan {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  monthlyPriceLabel String
+  monthlyPriceValue Decimal? @db.Decimal(10, 2)
+  currency          String   @default("TL")
+  analysisLimit     Int
+  analysisLimitLabel String
+  userLimit         Int?
+  userLimitLabel    String
+  status            String   @default("Aktif")
+  features          Json
+  isActive          Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model TeamMember {
+  id       String  @id @default(cuid())
+  salonId  String
+  name     String
+  email    String
+  role     String
+  isActive Boolean @default(true)
+
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
+
+  @@unique([salonId, email])
+}
+
+model Protocol {
+  id            String   @id @default(cuid())
+  salonId       String
+  name          String
+  sessionCount  Int
+  controlPeriod String
+  frequency     String
+  isActive      Boolean  @default(true)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  salon Salon @relation(fields: [salonId], references: [id], onDelete: Cascade)
+}
+
+model AnalysisUnitPrice {
+  id               String   @id @default(cuid())
+  pricePerAnalysis Decimal  @db.Decimal(10, 2)
+  currency         String   @default("TL")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model FirmAnalysisBalance {
+  id             String   @id @default(cuid())
+  firmId         String   @unique
+  totalPurchased Int      @default(0)
+  usedByPromo    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  firm Firm @relation(fields: [firmId], references: [id], onDelete: Cascade)
+}
+
+model FirmAnalysisSale {
+  id               String   @id @default(cuid())
+  firmId           String
+  quantity         Int
+  unitPrice        Decimal  @db.Decimal(10, 2)
+  totalAmount      Decimal  @db.Decimal(12, 2)
+  currency         String   @default("TL")
+  note             String?
+  createdAt        DateTime @default(now())
+
+  firm Firm @relation(fields: [firmId], references: [id], onDelete: Cascade)
+}
+
+model FirmPromoCode {
+  id            String          @id @default(cuid())
+  firmId        String
+  code          String          @unique
+  packageName   String
+  monthlyLimit  Int
+  userLimit     Int?
+  status        PromoCodeStatus @default(ACTIVE)
+  usedAt        DateTime?
+  usedBySalonId String?
+  createdAt     DateTime        @default(now())
+
+  firm Firm @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  usedBySalon Salon? @relation(fields: [usedBySalonId], references: [id], onDelete: SetNull)
+}
