@@ -439,7 +439,6 @@
 
   function bindAnalysisWizard(navigate) {
     const form = document.querySelector("#analysis-wizard");
-    if (!form) return;
 
     const resetButton = document.querySelector("[data-reset-analysis]");
     if (resetButton && resetButton.dataset.boundResetAnalysis !== "true") {
@@ -450,6 +449,97 @@
         window.CiltGPTRender();
       });
     }
+
+    const openCustomerModalButton = document.querySelector("[data-open-customer-modal]");
+    if (openCustomerModalButton && openCustomerModalButton.dataset.boundCustomerModal !== "true") {
+      openCustomerModalButton.dataset.boundCustomerModal = "true";
+      openCustomerModalButton.addEventListener("click", () => {
+        setState({ customerModalOpen: true, warning: "" });
+        window.CiltGPTRender();
+      });
+    }
+
+    document.querySelectorAll("[data-close-customer-modal]").forEach((button) => {
+      if (button.dataset.boundCloseCustomerModal === "true") return;
+      button.dataset.boundCloseCustomerModal = "true";
+      button.addEventListener("click", () => {
+        setState({ customerModalOpen: false });
+        window.CiltGPTRender();
+      });
+    });
+
+    const customerModal = document.querySelector("[data-customer-modal]");
+    if (customerModal && customerModal.dataset.boundBackdropClose !== "true") {
+      customerModal.dataset.boundBackdropClose = "true";
+      customerModal.addEventListener("click", (event) => {
+        if (event.target !== customerModal) return;
+        setState({ customerModalOpen: false });
+        window.CiltGPTRender();
+      });
+    }
+
+    const modalForm = document.querySelector("#analysis-customer-modal-form");
+    if (modalForm && modalForm.dataset.boundCustomerSubmit !== "true") {
+      modalForm.dataset.boundCustomerSubmit = "true";
+      modalForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const button = modalForm.querySelector('button[type="submit"]');
+        const message = modalForm.querySelector("#analysis-customer-modal-message");
+        const formData = new FormData(modalForm);
+        const fullName = String(formData.get("fullName") || "").trim();
+        const phone = String(formData.get("phone") || "").trim();
+
+        if (message) message.hidden = true;
+
+        if (!fullName || !phone) {
+          if (message) {
+            message.textContent = "Ad soyad ve telefon zorunludur.";
+            message.hidden = false;
+          }
+          return;
+        }
+
+        try {
+          if (button) button.disabled = true;
+
+          const response = await fetch("/api/customers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fullName,
+              phone,
+              age: formData.get("age") || "",
+              gender: formData.get("gender") || "",
+              notes: formData.get("notes") || "",
+            }),
+          });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.message || "Müşteri kaydedilirken bir hata oluştu.");
+
+          const createdCustomer = payload.customer;
+          const state = getState();
+          const dbCustomers = [createdCustomer, ...availableCustomers(state).filter((customer) => customer.id !== createdCustomer.id)];
+          setState({
+            dbCustomers,
+            selectedCustomerId: createdCustomer.id,
+            customerSearch: createdCustomer.fullName,
+            customerModalOpen: false,
+            warning: "",
+          });
+          window.CiltGPTRender();
+        } catch (error) {
+          if (message) {
+            message.textContent = error instanceof Error ? error.message : "Müşteri kaydedilirken bir hata oluştu.";
+            message.hidden = false;
+          }
+        } finally {
+          if (button) button.disabled = false;
+        }
+      });
+    }
+
+    if (!form) return;
 
     async function loadCustomers() {
       const state = getState();
@@ -570,95 +660,6 @@
       });
       window.CiltGPTRender();
     });
-
-    const openCustomerModalButton = document.querySelector("[data-open-customer-modal]");
-    if (openCustomerModalButton && openCustomerModalButton.dataset.boundCustomerModal !== "true") {
-      openCustomerModalButton.dataset.boundCustomerModal = "true";
-      openCustomerModalButton.addEventListener("click", () => {
-        setState({ customerModalOpen: true, warning: "" });
-        window.CiltGPTRender();
-      });
-    }
-
-    document.querySelectorAll("[data-close-customer-modal]").forEach((button) => {
-      if (button.dataset.boundCloseCustomerModal === "true") return;
-      button.dataset.boundCloseCustomerModal = "true";
-      button.addEventListener("click", () => {
-        setState({ customerModalOpen: false });
-        window.CiltGPTRender();
-      });
-    });
-
-    const customerModal = document.querySelector("[data-customer-modal]");
-    if (customerModal && customerModal.dataset.boundBackdropClose !== "true") {
-      customerModal.dataset.boundBackdropClose = "true";
-      customerModal.addEventListener("click", (event) => {
-        if (event.target !== customerModal) return;
-        setState({ customerModalOpen: false });
-        window.CiltGPTRender();
-      });
-    }
-
-    const modalForm = document.querySelector("#analysis-customer-modal-form");
-    if (modalForm && modalForm.dataset.boundCustomerSubmit !== "true") {
-      modalForm.dataset.boundCustomerSubmit = "true";
-      modalForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const button = modalForm.querySelector('button[type="submit"]');
-        const message = modalForm.querySelector("#analysis-customer-modal-message");
-        const formData = new FormData(modalForm);
-        const fullName = String(formData.get("fullName") || "").trim();
-        const phone = String(formData.get("phone") || "").trim();
-
-        if (message) message.hidden = true;
-
-        if (!fullName || !phone) {
-          if (message) {
-            message.textContent = "Ad soyad ve telefon zorunludur.";
-            message.hidden = false;
-          }
-          return;
-        }
-
-        try {
-          if (button) button.disabled = true;
-
-          const response = await fetch("/api/customers", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              fullName,
-              phone,
-              age: formData.get("age") || "",
-              gender: formData.get("gender") || "",
-              notes: formData.get("notes") || "",
-            }),
-          });
-          const payload = await response.json();
-          if (!response.ok) throw new Error(payload.message || "Müşteri kaydedilirken bir hata oluştu.");
-
-          const createdCustomer = payload.customer;
-          const state = getState();
-          const dbCustomers = [createdCustomer, ...availableCustomers(state).filter((customer) => customer.id !== createdCustomer.id)];
-          setState({
-            dbCustomers,
-            selectedCustomerId: createdCustomer.id,
-            customerSearch: createdCustomer.fullName,
-            customerModalOpen: false,
-            warning: "",
-          });
-          window.CiltGPTRender();
-        } catch (error) {
-          if (message) {
-            message.textContent = error instanceof Error ? error.message : "Müşteri kaydedilirken bir hata oluştu.";
-            message.hidden = false;
-          }
-        } finally {
-          if (button) button.disabled = false;
-        }
-      });
-    }
 
     form.querySelectorAll("[data-wizard-jump]").forEach((button) => {
       button.addEventListener("click", () => {
