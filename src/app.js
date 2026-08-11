@@ -1643,6 +1643,33 @@
     });
   }
 
+  async function loadAdminPromotions() {
+    if (currentPath() !== "/admin/packages") return;
+    const tbody = document.querySelector("#admin-promo-table-body");
+    const count = document.querySelector("#admin-promo-count");
+    const message = document.querySelector("#admin-promo-message");
+    if (!tbody) return;
+
+    try {
+      const response = await fetch("/api/admin/promotions");
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "Admin promosyon kodları alınamadı.");
+      const promoCodes = payload.promoCodes || [];
+      tbody.innerHTML = promoCodes.length
+        ? promoCodes.map(firmPromoRow).join("")
+        : '<tr><td colspan="7">Henüz admin promosyon kodu üretilmedi.</td></tr>';
+      if (count) count.textContent = `${promoCodes.length} kod`;
+    } catch (error) {
+      tbody.innerHTML = '<tr><td colspan="7">Admin promosyon kodları alınamadı.</td></tr>';
+      if (count) count.textContent = "Hata";
+      if (message) {
+        message.textContent = error instanceof Error ? error.message : "Admin promosyon kodları alınamadı.";
+        message.classList.add("error-message");
+        message.hidden = false;
+      }
+    }
+  }
+
   function bindAdminPackageModals() {
     if (currentPath() !== "/admin/packages") return;
     const message = document.querySelector("#admin-package-message");
@@ -1682,6 +1709,7 @@
             message.classList.remove("error-message");
             message.hidden = false;
           }
+          await loadAdminPromotions();
         } catch (error) {
           if (message) {
             message.textContent = error instanceof Error ? error.message : "Promosyon kodu üretilemedi.";
@@ -3337,6 +3365,7 @@
 
     if (path === "/admin/packages") {
       renderPackagePlansFromDatabase();
+      loadAdminPromotions();
     }
 
     if (path === "/admin/products") {

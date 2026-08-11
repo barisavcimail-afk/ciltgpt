@@ -1912,6 +1912,17 @@ async function handleAdminApi(req, res, pathname) {
       return;
     }
 
+    if (pathname === "/api/admin/promotions" && req.method === "GET") {
+      const promoCodes = await prisma.firmPromoCode.findMany({
+        where: { firmId: null },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        include: { usedBySalon: true },
+      });
+      sendJson(res, 200, { promoCodes: promoCodes.map(promoCodeResponse) });
+      return;
+    }
+
     if (pathname === "/api/admin/analyses" && req.method === "GET") {
       const analyses = await getAdminAnalyses();
       sendJson(res, 200, { analyses });

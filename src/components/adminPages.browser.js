@@ -339,6 +339,31 @@
       <section class="admin-package-grid" id="admin-package-grid">
         <article class="panel"><p class="muted">Paketler yükleniyor...</p></article>
       </section>
+      <section class="panel">
+        <div class="section-title">
+          <h2>Admin promosyon kodları</h2>
+          <span class="muted" id="admin-promo-count">Yükleniyor</span>
+        </div>
+        <div id="admin-promo-message" class="success-message error-message" hidden></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Kod</th>
+                <th>Paket</th>
+                <th>Analiz limiti</th>
+                <th>Kullanıcı limiti</th>
+                <th>Durum</th>
+                <th>Kullanan salon</th>
+                <th>Oluşturma</th>
+              </tr>
+            </thead>
+            <tbody id="admin-promo-table-body">
+              <tr><td colspan="7">Kodlar yükleniyor...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
       <div class="modal-backdrop" id="admin-package-manage-modal" hidden>
         <section class="customer-modal" role="dialog" aria-modal="true" aria-labelledby="admin-package-manage-title">
           <div class="modal-header">
