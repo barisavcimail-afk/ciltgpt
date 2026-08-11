@@ -289,7 +289,7 @@ model FirmAnalysisSale {
 
 model FirmPromoCode {
   id            String          @id @default(cuid())
-  firmId        String
+  firmId        String?
   code          String          @unique
   packageName   String
   monthlyLimit  Int
@@ -299,6 +299,6 @@ model FirmPromoCode {
   usedBySalonId String?
   createdAt     DateTime        @default(now())
 
-  firm Firm @relation(fields: [firmId], references: [id], onDelete: Cascade)
+  firm Firm? @relation(fields: [firmId], references: [id], onDelete: Cascade)
   usedBySalon Salon? @relation(fields: [usedBySalonId], references: [id], onDelete: SetNull)
 }
