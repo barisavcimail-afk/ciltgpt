@@ -1019,6 +1019,26 @@ async function getValidFirmPromoCode(tx, codeText, firmId) {
   return promoCode;
 }
 
+async function getValidSalonPromoCode(tx, codeText, salon) {
+  const normalizedCode = String(codeText || "").trim().toUpperCase();
+  if (!normalizedCode) return null;
+
+  const promoCode = await tx.firmPromoCode.findUnique({ where: { code: normalizedCode } });
+  if (!promoCode) {
+    throw new Error("Promosyon kodu bulunamadı.");
+  }
+  if (promoCode.firmId && promoCode.firmId !== salon.createdByFirmId) {
+    throw new Error("Bu promosyon kodu yalnızca kodu üreten firmanın eklediği salonlarda kullanılabilir.");
+  }
+  if (!promoCode.firmId && salon.createdByFirmId) {
+    throw new Error("Admin promosyon kodları sadece admin tarafından açılan salonlarda kullanılabilir.");
+  }
+  if (promoCode.status !== "ACTIVE" || promoCode.usedAt || promoCode.usedBySalonId) {
+    throw new Error("Bu promosyon kodu daha önce kullanılmış veya aktif değil.");
+  }
+  return promoCode;
+}
+
 function subscriptionResponse(subscription, packagePlan = null) {
   if (!subscription) return null;
 
@@ -1495,13 +1515,13 @@ async function handleSubscriptionApi(req, res) {
 
       const { prisma } = await import("./src/lib/repositories/customerRepository.server.js");
       const salon = await prisma.salon.findUnique({ where: { id: salonId }, include: { subscription: true } });
-      if (!salon?.createdByFirmId) {
-        sendJson(res, 403, { message: "Bu salon bir firma tarafından eklenmediği için firma promosyon kodu kullanamaz." });
+      if (!salon) {
+        sendJson(res, 404, { message: "Salon bulunamadı." });
         return;
       }
 
       const subscription = await prisma.$transaction(async (tx) => {
-        const promoCode = await getValidFirmPromoCode(tx, promoCodeText, salon.createdByFirmId);
+        const promoCode = await getValidSalonPromoCode(tx, promoCodeText, salon);
         const updatedSubscription = salon.subscription
           ? await tx.subscription.update({
               where: { salonId },
@@ -1748,19 +1768,10 @@ async function handleAdminApi(req, res, pathname) {
       const address = String(body.address || "").trim();
       const username = String(body.username || email.split("@")[0] || "").trim().toLowerCase();
       const password = String(body.password || "123456");
-      const firmId = String(body.firmId || "").trim();
 
       if (!name || !ownerName || !email || !phone || !city || !address || !username || !password) {
         sendJson(res, 400, { message: "Salon adı, yetkili, e-posta, telefon, şehir, adres, kullanıcı adı ve şifre zorunludur." });
         return;
-      }
-
-      if (firmId) {
-        const firm = await prisma.firm.findUnique({ where: { id: firmId } });
-        if (!firm) {
-          sendJson(res, 400, { message: "Geçerli bir firma seçin." });
-          return;
-        }
       }
 
       const existingSalon = await prisma.salon.findUnique({ where: { email } });
@@ -1785,7 +1796,6 @@ async function handleAdminApi(req, res, pathname) {
           address,
           reportSalonName: name,
           createdByUserId: session.id,
-          createdByFirmId: firmId || null,
           users: {
             create: {
               name: ownerName,
@@ -1809,6 +1819,96 @@ async function handleAdminApi(req, res, pathname) {
 
       const salons = await getAllSalons();
       sendJson(res, 201, { message: "Salon başarıyla oluşturuldu.", salons });
+      return;
+    }
+
+    if (pathname === "/api/admin/salon-package" && req.method === "POST") {
+      const body = await readJsonBody(req);
+      const salonId = String(body.salonId || "").trim();
+      const packageName = String(body.packageName || "").trim();
+
+      if (!salonId || !packageName) {
+        sendJson(res, 400, { message: "Salon ve paket seçimi zorunludur." });
+        return;
+      }
+
+      const [salon, selectedPackage] = await Promise.all([
+        prisma.salon.findUnique({ where: { id: salonId }, include: { subscription: true } }),
+        getPackagePlanByName(prisma, packageName),
+      ]);
+
+      if (!salon || salon.createdByFirmId) {
+        sendJson(res, 403, { message: "Paket sadece admin tarafından açılan salonlara tanımlanabilir." });
+        return;
+      }
+
+      if (!selectedPackage) {
+        sendJson(res, 400, { message: "Geçerli bir paket seçin." });
+        return;
+      }
+
+      const subscription = salon.subscription
+        ? await prisma.subscription.update({
+            where: { salonId },
+            data: {
+              packageName: selectedPackage.name,
+              monthlyLimit: selectedPackage.analysisLimit,
+              currentUsage: 0,
+              renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              status: "ACTIVE",
+            },
+          })
+        : await prisma.subscription.create({
+            data: {
+              salonId,
+              packageName: selectedPackage.name,
+              monthlyLimit: selectedPackage.analysisLimit,
+              currentUsage: 0,
+              renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              status: "ACTIVE",
+            },
+          });
+
+      const salons = await getAllSalons();
+      sendJson(res, 200, {
+        message: `${salon.name} için ${selectedPackage.name} paketi tanımlandı.`,
+        subscription: subscriptionResponse(subscription, selectedPackage),
+        salons,
+      });
+      return;
+    }
+
+    if (pathname === "/api/admin/promotions" && req.method === "POST") {
+      const body = await readJsonBody(req);
+      const packageName = String(body.packageName || "").trim();
+      const selectedPackage = await getPackagePlanByName(prisma, packageName);
+
+      if (!selectedPackage) {
+        sendJson(res, 400, { message: "Geçerli bir paket seçin." });
+        return;
+      }
+
+      let codeText = generatePromoCodeText(selectedPackage.name);
+      let exists = await prisma.firmPromoCode.findUnique({ where: { code: codeText } });
+      while (exists) {
+        codeText = generatePromoCodeText(selectedPackage.name);
+        exists = await prisma.firmPromoCode.findUnique({ where: { code: codeText } });
+      }
+
+      const promoCode = await prisma.firmPromoCode.create({
+        data: {
+          firmId: null,
+          code: codeText,
+          packageName: selectedPackage.name,
+          monthlyLimit: selectedPackage.analysisLimit,
+          userLimit: selectedPackage.userLimit,
+        },
+      });
+
+      sendJson(res, 201, {
+        message: "Admin promosyon kodu üretildi. Bu kod sadece admin tarafından açılan salonlarda kullanılabilir.",
+        promoCode: promoCodeResponse(promoCode),
+      });
       return;
     }
 

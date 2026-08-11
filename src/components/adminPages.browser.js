@@ -54,6 +54,7 @@
           <h2>Salon listesi</h2>
           <div class="section-actions">
             <span class="muted" id="admin-salons-count">Yükleniyor</span>
+            <button class="button ghost" type="button" data-open-admin-salon-package-modal>Paket ekle</button>
             <button class="button" type="button" data-open-admin-salon-modal>Yeni salon ekle</button>
           </div>
         </div>
@@ -109,16 +110,42 @@
               <label><span>Adres</span><input name="address" type="text" required /></label>
               <label><span>Salon kullanıcı adı</span><input name="username" type="text" required /></label>
               <label><span>Geçici şifre</span><input name="password" type="text" value="123456" required /></label>
-              <label>
-                <span>Bağlı firma</span>
-                <select name="firmId" id="admin-salon-firm-select">
-                  <option value="">Firma seçmeden aç</option>
-                </select>
-              </label>
             </div>
             <div class="modal-actions">
               <button class="button ghost" type="button" data-close-admin-salon-create-modal>Vazgeç</button>
               <button class="button" type="submit">Salon ekle</button>
+            </div>
+          </form>
+        </section>
+      </div>
+      <div class="modal-backdrop" id="admin-salon-package-modal" hidden>
+        <section class="customer-modal" role="dialog" aria-modal="true" aria-labelledby="admin-salon-package-title">
+          <div class="modal-header">
+            <div>
+              <p class="eyebrow">Admin salon paketi</p>
+              <h2 id="admin-salon-package-title">Paketi salona tanımla</h2>
+            </div>
+            <button class="icon-button" type="button" aria-label="Kapat" data-close-admin-salon-package-modal>&times;</button>
+          </div>
+          <form id="admin-salon-package-form" class="modal-form">
+            <div id="admin-salon-package-message" class="success-message" hidden></div>
+            <div class="form-grid">
+              <label>
+                <span>Admin tarafından açılan salon</span>
+                <select name="salonId" id="admin-salon-package-salon-select" required>
+                  <option value="">Salon seçin</option>
+                </select>
+              </label>
+              <label>
+                <span>Paket</span>
+                <select name="packageName" id="admin-salon-package-package-select" required>
+                  <option value="">Paket seçin</option>
+                </select>
+              </label>
+            </div>
+            <div class="modal-actions">
+              <button class="button ghost" type="button" data-close-admin-salon-package-modal>Vazgeç</button>
+              <button class="button" type="submit">Paketi tanımla</button>
             </div>
           </form>
         </section>

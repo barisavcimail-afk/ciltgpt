@@ -81,6 +81,9 @@ export async function getAllSalons() {
         usedAnalyses: currentUsage,
         monthlyAnalyses: salon.analyses.length,
         remainingAnalyses: Math.max(monthlyLimit - currentUsage, 0),
+        createdByFirmId: salon.createdByFirmId || "",
+        createdByUserId: salon.createdByUserId || "",
+        isAdminCreated: !salon.createdByFirmId,
         createdBy:
           salon.createdByFirm?.name || salon.createdByUser?.name
             ? `${salon.createdByFirm?.name || "Sistem"}${salon.createdByUser?.name ? ` / ${salon.createdByUser.name}` : ""}`

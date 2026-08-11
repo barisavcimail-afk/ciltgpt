@@ -117,6 +117,7 @@
         <p>${pack.analysisLimitLabel}</p>
         <p>${pack.userLimit}</p>
         <button class="button ghost" type="button" data-manage-package="${pack.id}">Paketi yönet</button>
+        <button class="button" type="button" data-admin-generate-promo="${pack.name}">Promosyon kodu üret</button>
       </article>
     `;
   }

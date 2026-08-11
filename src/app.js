@@ -1658,6 +1658,42 @@
       });
     });
 
+    document.querySelectorAll("[data-admin-generate-promo]").forEach((button) => {
+      if (button.dataset.boundAdminGeneratePromo === "true") return;
+      button.dataset.boundAdminGeneratePromo = "true";
+      button.addEventListener("click", async () => {
+        const packageName = button.dataset.adminGeneratePromo || "";
+        if (message) {
+          message.hidden = true;
+          message.classList.remove("error-message");
+        }
+
+        try {
+          button.disabled = true;
+          const response = await fetch("/api/admin/promotions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ packageName }),
+          });
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.message || "Promosyon kodu üretilemedi.");
+          if (message) {
+            message.textContent = `${payload.message} Kod: ${payload.promoCode?.code || ""}`;
+            message.classList.remove("error-message");
+            message.hidden = false;
+          }
+        } catch (error) {
+          if (message) {
+            message.textContent = error instanceof Error ? error.message : "Promosyon kodu üretilemedi.";
+            message.classList.add("error-message");
+            message.hidden = false;
+          }
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+
     const createButton = document.querySelector("[data-open-package-create-modal]");
     if (createButton && createButton.dataset.boundPackageCreateOpen !== "true") {
       createButton.dataset.boundPackageCreateOpen = "true";
@@ -2446,24 +2482,6 @@
     const form = document.querySelector("#admin-salon-create-form");
     const message = document.querySelector("#admin-salon-create-message");
     const apiMessage = document.querySelector("#admin-salons-api-message");
-    async function loadAdminSalonFirmOptions() {
-      const select = document.querySelector("#admin-salon-firm-select");
-      if (!select) return;
-      try {
-        const response = await fetch("/api/admin/firms");
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.message || "Firmalar alınamadı.");
-        const firms = payload.firms || [];
-        select.innerHTML =
-          '<option value="">Firma seçmeden aç</option>' +
-          firms
-            .map((firm) => `<option value="${escapeHtml(firm.id)}">${escapeHtml(firm.name)} - ${escapeHtml(firm.brandName)}</option>`)
-            .join("");
-      } catch {
-        select.innerHTML = '<option value="">Firmalar alınamadı</option>';
-      }
-    }
-
     const openModal = () => {
       if (!modal) return;
       if (message) {
@@ -2471,7 +2489,6 @@
         message.classList.remove("error-message");
       }
       modal.hidden = false;
-      loadAdminSalonFirmOptions();
     };
     const closeModal = () => {
       if (!modal) return;
@@ -2522,7 +2539,6 @@
             address: formData.get("address") || "",
             username: formData.get("username") || "",
             password: formData.get("password") || "",
-            firmId: formData.get("firmId") || "",
           }),
         });
         const payload = await response.json();
@@ -2540,6 +2556,113 @@
       } catch (error) {
         if (message) {
           message.textContent = error instanceof Error ? error.message : "Salon oluşturulurken bir hata oluştu.";
+          message.classList.add("error-message");
+          message.hidden = false;
+        }
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  }
+
+  async function fillAdminSalonPackageOptions() {
+    const salonSelect = document.querySelector("#admin-salon-package-salon-select");
+    const packageSelect = document.querySelector("#admin-salon-package-package-select");
+    if (!salonSelect || !packageSelect) return;
+
+    const adminSalons = adminSalonListState.salons.filter((salon) => salon.isAdminCreated);
+    salonSelect.innerHTML =
+      '<option value="">Salon seçin</option>' +
+      adminSalons
+        .map((salon) => `<option value="${escapeHtml(salon.id)}">${escapeHtml(salon.name)}${salon.packageName && salon.packageName !== "-" ? ` - mevcut: ${escapeHtml(salon.packageName)}` : ""}</option>`)
+        .join("");
+
+    try {
+      const packages = window.CiltGPTSubscription.packages?.length
+        ? window.CiltGPTSubscription.packages
+        : await fetchPackagePlansFromDatabase();
+      packageSelect.innerHTML =
+        '<option value="">Paket seçin</option>' +
+        packages
+          .map((pack) => `<option value="${escapeHtml(pack.name)}">${escapeHtml(pack.name)} - ${escapeHtml(pack.analysisLimitLabel || pack.analysisLimit)}</option>`)
+          .join("");
+    } catch {
+      packageSelect.innerHTML = '<option value="">Paketler alınamadı</option>';
+    }
+  }
+
+  function bindAdminSalonPackageModal() {
+    const modal = document.querySelector("#admin-salon-package-modal");
+    const form = document.querySelector("#admin-salon-package-form");
+    const message = document.querySelector("#admin-salon-package-message");
+    const apiMessage = document.querySelector("#admin-salons-api-message");
+    const openModal = () => {
+      if (!modal) return;
+      if (message) {
+        message.hidden = true;
+        message.classList.remove("error-message");
+      }
+      fillAdminSalonPackageOptions();
+      modal.hidden = false;
+    };
+    const closeModal = () => {
+      if (modal) modal.hidden = true;
+    };
+
+    document.querySelectorAll("[data-open-admin-salon-package-modal]").forEach((button) => {
+      if (button.dataset.boundAdminSalonPackageOpen === "true") return;
+      button.dataset.boundAdminSalonPackageOpen = "true";
+      button.addEventListener("click", openModal);
+    });
+
+    document.querySelectorAll("[data-close-admin-salon-package-modal]").forEach((button) => {
+      if (button.dataset.boundAdminSalonPackageClose === "true") return;
+      button.dataset.boundAdminSalonPackageClose = "true";
+      button.addEventListener("click", closeModal);
+    });
+
+    if (modal && modal.dataset.boundAdminSalonPackageBackdrop !== "true") {
+      modal.dataset.boundAdminSalonPackageBackdrop = "true";
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) closeModal();
+      });
+    }
+
+    if (!form || form.dataset.boundAdminSalonPackageSubmit === "true") return;
+    form.dataset.boundAdminSalonPackageSubmit = "true";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]');
+      const formData = new FormData(form);
+      if (message) {
+        message.hidden = true;
+        message.classList.remove("error-message");
+      }
+
+      try {
+        if (button) button.disabled = true;
+        const response = await fetch("/api/admin/salon-package", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            salonId: formData.get("salonId") || "",
+            packageName: formData.get("packageName") || "",
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "Paket tanımlanamadı.");
+
+        adminSalonListState.salons = payload.salons || [];
+        renderAdminSalonList();
+        closeModal();
+        if (apiMessage) {
+          apiMessage.textContent = payload.message || "Paket tanımlandı.";
+          apiMessage.classList.remove("error-message");
+          apiMessage.hidden = false;
+        }
+      } catch (error) {
+        if (message) {
+          message.textContent = error instanceof Error ? error.message : "Paket tanımlanamadı.";
           message.classList.add("error-message");
           message.hidden = false;
         }
@@ -2800,6 +2923,7 @@
       if (!tbody) return;
       bindAdminSalonSearch();
       bindAdminSalonCreateModal();
+      bindAdminSalonPackageModal();
       renderAdminSalonList();
     } catch (error) {
       if (count) count.textContent = "Hata";
