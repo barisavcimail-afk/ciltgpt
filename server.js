@@ -2985,11 +2985,17 @@ export async function handleRequest(req, res) {
     const filePath = assetPathname === "/" ? join(root, "index.html") : safePath(assetPathname.slice(1));
     const ext = extname(filePath);
     const file = await readFile(filePath);
-    res.writeHead(200, { "Content-Type": contentTypes[ext] || "application/octet-stream" });
+    res.writeHead(200, {
+      "Content-Type": contentTypes[ext] || "application/octet-stream",
+      "Cache-Control": "no-store, max-age=0",
+    });
     res.end(file);
   } catch {
     const app = await readFile(join(root, "index.html"));
-    res.writeHead(200, { "Content-Type": contentTypes[".html"] });
+    res.writeHead(200, {
+      "Content-Type": contentTypes[".html"],
+      "Cache-Control": "no-store, max-age=0",
+    });
     res.end(app);
   }
 }
