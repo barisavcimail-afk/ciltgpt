@@ -2,7 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
-import { randomBytes, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 const port = Number(process.env.PORT || 3000);
 const root = process.cwd();
@@ -34,6 +34,8 @@ loadEnvFile();
 const sessions = new Map();
 const salonLoginPassword = process.env.SALON_LOGIN_PASSWORD || "123456";
 const adminLoginPassword = process.env.ADMIN_LOGIN_PASSWORD || "admin123";
+const sessionSecret = process.env.SESSION_SECRET || `${salonLoginPassword}:${adminLoginPassword}:ciltgpt-session`;
+const sessionMaxAge = 60 * 60 * 24 * 7;
 const rolePermissions = {
   "Salon Yoneticisi": ["dashboard", "customers", "analyses", "reports", "products", "team", "billing", "settings", "subscription", "protocols"],
   "Salon Yöneticisi": ["dashboard", "customers", "analyses", "reports", "products", "team", "billing", "settings", "subscription", "protocols"],
@@ -71,9 +73,53 @@ function parseCookies(req) {
   );
 }
 
-function createSession(res, user) {
-  const token = randomUUID();
-  sessions.set(token, {
+function encodeBase64Url(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64url");
+}
+
+function decodeBase64Url(value) {
+  return JSON.parse(Buffer.from(value, "base64url").toString("utf8"));
+}
+
+function signSessionPayload(payload) {
+  return createHmac("sha256", sessionSecret).update(payload).digest("base64url");
+}
+
+function createSessionToken(session) {
+  const payload = encodeBase64Url({
+    ...session,
+    exp: Math.floor(Date.now() / 1000) + sessionMaxAge,
+  });
+  return `${payload}.${signSessionPayload(payload)}`;
+}
+
+function readSessionToken(token) {
+  if (!token || !token.includes(".")) return null;
+  const [payload, signature] = token.split(".");
+  const expected = signSessionPayload(payload);
+  const expectedBuffer = Buffer.from(expected);
+  const signatureBuffer = Buffer.from(signature || "");
+  if (expectedBuffer.length !== signatureBuffer.length || !timingSafeEqual(expectedBuffer, signatureBuffer)) {
+    return null;
+  }
+
+  try {
+    const session = decodeBase64Url(payload);
+    if (!session.exp || session.exp < Math.floor(Date.now() / 1000)) return null;
+    const { exp, ...safeSession } = session;
+    return safeSession;
+  } catch {
+    return null;
+  }
+}
+
+function setSessionCookie(req, res, token) {
+  const secure = process.env.VERCEL || req.headers["x-forwarded-proto"] === "https" ? "; Secure" : "";
+  res.setHeader("Set-Cookie", `ciltgpt_session=${encodeURIComponent(token)}; HttpOnly; Path=/; Max-Age=${sessionMaxAge}; SameSite=Lax${secure}`);
+}
+
+function createSession(req, res, user) {
+  const session = {
     id: user.id,
     name: user.name,
     email: user.email,
@@ -87,9 +133,11 @@ function createSession(res, user) {
     firmLogoUrl: user.firm?.logoUrl || "",
     salonName: user.salon?.name || "",
     salonLogoUrl: user.salon?.logoUrl || "",
-  });
-  res.setHeader("Set-Cookie", `ciltgpt_session=${encodeURIComponent(token)}; HttpOnly; Path=/; SameSite=Lax`);
-  return sessions.get(token);
+  };
+  const token = createSessionToken(session);
+  sessions.set(token, session);
+  setSessionCookie(req, res, token);
+  return session;
 }
 
 function hashPassword(password) {
@@ -117,12 +165,14 @@ function hasRolePermission(session, permission) {
 function clearSession(req, res) {
   const token = parseCookies(req).ciltgpt_session;
   if (token) sessions.delete(token);
-  res.setHeader("Set-Cookie", "ciltgpt_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax");
+  const secure = process.env.VERCEL || req.headers["x-forwarded-proto"] === "https" ? "; Secure" : "";
+  res.setHeader("Set-Cookie", `ciltgpt_session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax${secure}`);
 }
 
 function getSession(req) {
   const token = parseCookies(req).ciltgpt_session;
-  return token ? sessions.get(token) || null : null;
+  if (!token) return null;
+  return readSessionToken(token) || sessions.get(token) || null;
 }
 
 function requireSalonSession(req, res, permission = "") {
@@ -1070,8 +1120,9 @@ async function handleAuthApi(req, res, pathname) {
         salonLogoUrl: user.salon?.logoUrl || "",
       };
 
-      const token = parseCookies(req).ciltgpt_session;
-      if (token) sessions.set(token, hydratedSession);
+      const token = createSessionToken(hydratedSession);
+      sessions.set(token, hydratedSession);
+      setSessionCookie(req, res, token);
 
       sendJson(res, 200, { user: hydratedSession });
       return;
@@ -1131,7 +1182,7 @@ async function handleAuthApi(req, res, pathname) {
         return;
       }
 
-      const session = createSession(res, user);
+      const session = createSession(req, res, user);
       sendJson(res, 200, { user: session, redirectTo: isAdminLogin ? "/admin" : isFirmLogin ? "/firm" : "/dashboard" });
       return;
     }
