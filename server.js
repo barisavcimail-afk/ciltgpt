@@ -86,8 +86,15 @@ function signSessionPayload(payload) {
 }
 
 function createSessionToken(session) {
+  const cookieSession = {
+    id: session.id,
+    role: session.role,
+    staffRole: session.staffRole || "",
+    salonId: session.salonId || null,
+    firmId: session.firmId || null,
+  };
   const payload = encodeBase64Url({
-    ...session,
+    ...cookieSession,
     exp: Math.floor(Date.now() / 1000) + sessionMaxAge,
   });
   return `${payload}.${signSessionPayload(payload)}`;
