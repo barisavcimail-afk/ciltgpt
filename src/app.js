@@ -4139,6 +4139,49 @@
     return placeholderPage("Raporlar");
   }
 
+  function captureFocusedField() {
+    const active = document.activeElement;
+    if (!active || !["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName)) return null;
+
+    const selector = active.id
+      ? `#${CSS.escape(active.id)}`
+      : active.name
+        ? `${active.tagName.toLowerCase()}[name="${CSS.escape(active.name)}"]`
+        : null;
+
+    if (!selector) return null;
+
+    return {
+      selector,
+      value: active.value,
+      selectionStart: typeof active.selectionStart === "number" ? active.selectionStart : null,
+      selectionEnd: typeof active.selectionEnd === "number" ? active.selectionEnd : null,
+    };
+  }
+
+  function restoreFocusedField(snapshot) {
+    if (!snapshot) return;
+    const field = document.querySelector(snapshot.selector);
+    if (!field || !["INPUT", "TEXTAREA", "SELECT"].includes(field.tagName)) return;
+
+    if (field.value !== snapshot.value) {
+      field.value = snapshot.value;
+    }
+
+    field.focus({ preventScroll: true });
+    if (
+      snapshot.selectionStart !== null &&
+      snapshot.selectionEnd !== null &&
+      typeof field.setSelectionRange === "function"
+    ) {
+      try {
+        field.setSelectionRange(snapshot.selectionStart, snapshot.selectionEnd);
+      } catch {
+        // Some input types do not support selection ranges.
+      }
+    }
+  }
+
   function bindEvents() {
     bindRouteLinks();
     bindMobileMenu();
@@ -4247,6 +4290,7 @@
 
   function render() {
     const path = currentPath();
+    const focusedField = captureFocusedField();
 
     if ((isSalonPath(path) || isAdminPath(path) || isFirmPath(path)) && !authChecked) {
       app.innerHTML = authLoading();
@@ -4292,6 +4336,7 @@
         ? content
         : renderLayout(content, path, toHref, authUser);
     bindEvents();
+    restoreFocusedField(focusedField);
   }
 
   window.CiltGPTRender = render;
