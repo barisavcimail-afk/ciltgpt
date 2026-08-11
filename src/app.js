@@ -2446,20 +2446,21 @@
     const form = document.querySelector("#admin-salon-create-form");
     const message = document.querySelector("#admin-salon-create-message");
     const apiMessage = document.querySelector("#admin-salons-api-message");
-    async function loadAdminSalonPackageOptions() {
-      const select = document.querySelector("#admin-salon-package-select");
+    async function loadAdminSalonFirmOptions() {
+      const select = document.querySelector("#admin-salon-firm-select");
       if (!select) return;
       try {
-        const packages = window.CiltGPTSubscription.packages?.length
-          ? window.CiltGPTSubscription.packages
-          : await fetchPackagePlansFromDatabase();
+        const response = await fetch("/api/admin/firms");
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "Firmalar alınamadı.");
+        const firms = payload.firms || [];
         select.innerHTML =
-          '<option value="">Paket seçin</option>' +
-          packages
-            .map((pack) => `<option value="${escapeHtml(pack.name)}">${escapeHtml(pack.name)} - ${escapeHtml(pack.analysisLimitLabel || pack.analysisLimit)}</option>`)
+          '<option value="">Firma seçmeden aç</option>' +
+          firms
+            .map((firm) => `<option value="${escapeHtml(firm.id)}">${escapeHtml(firm.name)} - ${escapeHtml(firm.brandName)}</option>`)
             .join("");
       } catch {
-        select.innerHTML = '<option value="">Paketler alınamadı</option>';
+        select.innerHTML = '<option value="">Firmalar alınamadı</option>';
       }
     }
 
@@ -2470,7 +2471,7 @@
         message.classList.remove("error-message");
       }
       modal.hidden = false;
-      loadAdminSalonPackageOptions();
+      loadAdminSalonFirmOptions();
     };
     const closeModal = () => {
       if (!modal) return;
@@ -2521,8 +2522,7 @@
             address: formData.get("address") || "",
             username: formData.get("username") || "",
             password: formData.get("password") || "",
-            packageAction: formData.get("packageAction") || "none",
-            packageName: formData.get("packageName") || "",
+            firmId: formData.get("firmId") || "",
           }),
         });
         const payload = await response.json();

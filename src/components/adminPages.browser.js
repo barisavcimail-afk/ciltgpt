@@ -110,17 +110,9 @@
               <label><span>Salon kullanıcı adı</span><input name="username" type="text" required /></label>
               <label><span>Geçici şifre</span><input name="password" type="text" value="123456" required /></label>
               <label>
-                <span>Paket işlemi</span>
-                <select name="packageAction" id="admin-salon-package-action">
-                  <option value="none">Paketsiz aç</option>
-                  <option value="direct">Paketi doğrudan tanımla</option>
-                  <option value="promo">Promosyon kodu üret</option>
-                </select>
-              </label>
-              <label>
-                <span>Paket</span>
-                <select name="packageName" id="admin-salon-package-select">
-                  <option value="">Paket seçin</option>
+                <span>Bağlı firma</span>
+                <select name="firmId" id="admin-salon-firm-select">
+                  <option value="">Firma seçmeden aç</option>
                 </select>
               </label>
             </div>
