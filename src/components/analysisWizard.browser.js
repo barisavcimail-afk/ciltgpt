@@ -385,7 +385,7 @@
     return `
       ${pageHeader("Yeni Analiz", "Müşteri seçimi, onay, fotoğraflar, cilt soruları ve özet adımlarından oluşan analiz akışı.")}
       <div class="wizard-reset-row">
-        <button class="button" type="button" data-open-customer-modal>Yeni müşteri oluştur</button>
+        <a class="button" href="/dashboard/customers" data-link>Yeni müşteri oluştur</a>
         <button class="button ghost" type="button" data-reset-analysis>Tercihleri s&#305;f&#305;rla</button>
       </div>
       <form id="analysis-wizard" class="analysis-wizard">
@@ -402,7 +402,6 @@
           }
         </div>
       </form>
-      ${state.customerModalOpen ? customerModal() : ""}
     `;
   }
 
