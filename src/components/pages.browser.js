@@ -603,11 +603,6 @@
             </label>
             <button class="button large" type="submit">${isAdmin ? "Admin girişi yap" : isFirm ? "Firma girişi yap" : "Giriş yap"}</button>
           </form>
-          <div class="auth-switch-links">
-            <a class="table-action muted-action" href="/login" data-path="/login">Salon girişi</a>
-            <a class="table-action muted-action" href="/admin-login" data-path="/admin-login">Admin girişi</a>
-            <a class="table-action muted-action" href="/firm-login" data-path="/firm-login">Firma girişi</a>
-          </div>
         </section>
       </main>
     `;

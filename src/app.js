@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const app = document.querySelector("#app");
   const isFileMode = window.location.protocol === "file:";
   const { renderLayout } = window.CiltGPTComponents;
@@ -4265,7 +4265,35 @@
     });
   }
 
+  function bindHiddenAuthEntrances() {
+    const path = currentPath();
+    if (!["/login", "/admin-login", "/firm-login"].includes(path)) return;
+    if (document.body.dataset.boundHiddenAuthEntrances === "true") return;
+    document.body.dataset.boundHiddenAuthEntrances = "true";
+    let typedCommand = "";
+
+    window.addEventListener("keydown", (event) => {
+      if (!["/login", "/admin-login", "/firm-login"].includes(currentPath())) return;
+      const target = event.target;
+      const tagName = target?.tagName?.toLowerCase();
+      if (tagName === "input" || tagName === "textarea" || tagName === "select" || target?.isContentEditable) return;
+      if (event.key.length !== 1) return;
+
+      typedCommand = (typedCommand + event.key).toLocaleLowerCase("tr-TR").slice(-10);
+      if (typedCommand.endsWith("admin")) {
+        typedCommand = "";
+        navigate("/admin-login");
+      }
+      if (typedCommand.endsWith("firma")) {
+        typedCommand = "";
+        navigate("/firm-login");
+      }
+    });
+  }
+
   function bindAuthForms() {
+    bindHiddenAuthEntrances();
+
     document.querySelectorAll("[data-toggle-password]").forEach((button) => {
       if (button.dataset.boundPasswordToggle === "true") return;
       button.dataset.boundPasswordToggle = "true";
@@ -4554,4 +4582,5 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
 
