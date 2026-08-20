@@ -3688,26 +3688,50 @@
     const downloadButton = document.querySelector("[data-download-pdf]");
     if (downloadButton && downloadButton.dataset.boundReportAction !== "true") {
       downloadButton.dataset.boundReportAction = "true";
-      downloadButton.addEventListener("click", () => {
-        const reportPreview = document.querySelector("#report-preview");
-        const reportTitle = document.querySelector(".report-hero h2")?.textContent?.trim() || "ciltgpt-analiz-raporu";
-        const previousTitle = document.title;
-        const filenameTitle = reportTitle
-          .toLocaleLowerCase("tr-TR")
-          .replace(/[^a-z0-9çğıöşü]+/gi, "-")
-          .replace(/^-+|-+$/g, "") || "ciltgpt-analiz-raporu";
+      downloadButton.addEventListener("click", async () => {
+        const message = document.querySelector("#report-action-message");
+        const reportId = currentPath().split("/").filter(Boolean).pop();
+        if (!reportId) return;
 
-        if (!reportPreview) return;
-        document.title = filenameTitle + "-analiz-raporu";
-        document.body.classList.add("printing-report");
-        const cleanup = () => {
-          document.body.classList.remove("printing-report");
-          document.title = previousTitle;
-          window.removeEventListener("afterprint", cleanup);
-        };
-        window.addEventListener("afterprint", cleanup);
-        window.print();
-        window.setTimeout(cleanup, 1200);
+        try {
+          downloadButton.disabled = true;
+          const response = await fetch(`/api/reports/${encodeURIComponent(reportId)}/pdf`);
+          if (!response.ok) {
+            let errorMessage = "PDF oluşturulurken bir hata oluştu.";
+            try {
+              const payload = await response.json();
+              errorMessage = payload.message || errorMessage;
+            } catch {}
+            throw new Error(errorMessage);
+          }
+
+          const blob = await response.blob();
+          const disposition = response.headers.get("content-disposition") || "";
+          const filenameMatch = disposition.match(/filename="?([^";]+)"?/i);
+          const fallbackName = `${document.querySelector(".report-hero h2")?.textContent?.trim() || "ciltgpt"}-analiz-raporu.pdf`
+            .toLocaleLowerCase("tr-TR")
+            .replace(/[^a-z0-9çğıöşü.]+/gi, "-")
+            .replace(/^-+|-+$/g, "");
+          const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : fallbackName;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        } catch (error) {
+          if (message) {
+            message.textContent = error instanceof Error ? error.message : "PDF oluşturulurken bir hata oluştu.";
+            message.hidden = false;
+            setTimeout(() => {
+              message.hidden = true;
+            }, 3000);
+          }
+        } finally {
+          downloadButton.disabled = false;
+        }
       });
     }
 
@@ -4586,6 +4610,7 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
 
 
 
