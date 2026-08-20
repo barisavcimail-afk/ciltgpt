@@ -3343,6 +3343,68 @@
     }
   }
 
+  function renderAdminOpenAIStatus(settings) {
+    const status = document.querySelector("#admin-openai-status");
+    const modelInput = document.querySelector('#admin-settings-form [name="openAIModel"]');
+    if (modelInput && settings?.openAI?.model) modelInput.value = settings.openAI.model;
+    if (!status) return;
+    const sourceLabel = settings?.openAI?.source === "database" ? "Veritabanı" : settings?.openAI?.source === "env" ? "Ortam değişkeni" : "Tanımsız";
+    status.textContent = settings?.openAI?.configured
+      ? "OpenAI key tanımlı. Kaynak: " + sourceLabel + ". Model: " + (settings.openAI.model || "gpt-5-mini")
+      : "OpenAI key tanımlı değil. API key alanına key girip kaydedin.";
+  }
+
+  async function loadAdminSystemSettings() {
+    if (currentPath() !== "/admin/settings") return;
+    try {
+      const response = await fetch("/api/admin/settings");
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.message || "Sistem ayarları alınamadı.");
+      renderAdminOpenAIStatus(payload.settings);
+    } catch (error) {
+      const status = document.querySelector("#admin-openai-status");
+      if (status) status.textContent = error instanceof Error ? error.message : "Sistem ayarları alınamadı.";
+    }
+  }
+
+  function bindAdminSystemSettingsForm() {
+    if (currentPath() !== "/admin/settings") return;
+    const form = document.querySelector("#admin-settings-form");
+    if (!form || form.dataset.boundAdminSystemSettings === "true") return;
+    form.dataset.boundAdminSystemSettings = "true";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const message = document.querySelector("#admin-settings-success");
+      const formData = new FormData(form);
+      try {
+        const response = await fetch("/api/admin/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            openAIApiKey: String(formData.get("openAIApiKey") || ""),
+            openAIModel: String(formData.get("openAIModel") || "gpt-5-mini"),
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.message || "Sistem ayarları kaydedilemedi.");
+        form.querySelector('[name="openAIApiKey"]').value = "";
+        renderAdminOpenAIStatus(payload.settings);
+        if (message) {
+          message.textContent = payload.message || "Sistem ayarları başarıyla kaydedildi.";
+          message.classList.remove("error-message");
+          message.hidden = false;
+          setTimeout(() => { message.hidden = true; }, 2200);
+        }
+      } catch (error) {
+        if (message) {
+          message.textContent = error instanceof Error ? error.message : "Sistem ayarları kaydedilemedi.";
+          message.classList.add("error-message");
+          message.hidden = false;
+        }
+      }
+    });
+  }
+
   function bindAdminDatabasePages() {
     const path = currentPath();
     if (path === "/admin") {
@@ -3366,6 +3428,11 @@
     if (path === "/admin/packages") {
       renderPackagePlansFromDatabase();
       loadAdminPromotions();
+    }
+
+    if (path === "/admin/settings") {
+      loadAdminSystemSettings();
+      bindAdminSystemSettingsForm();
     }
 
     if (path === "/admin/products") {
@@ -4414,20 +4481,6 @@
           setTimeout(() => {
             message.hidden = true;
           }, 2400);
-        }
-      });
-    }
-
-    const adminSettingsForm = document.querySelector("#admin-settings-form");
-    if (adminSettingsForm) {
-      adminSettingsForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const message = document.querySelector("#admin-settings-success");
-        if (message) {
-          message.hidden = false;
-          setTimeout(() => {
-            message.hidden = true;
-          }, 2200);
         }
       });
     }

@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { getOpenAIConfig } from "../repositories/systemSettingsRepository.server";
 import type { AnalysisInput, AnalysisOutput, RecommendedProduct } from "../analysis/types";
 
 declare const process: {
@@ -152,17 +153,18 @@ function normalizeOutput(input: AnalysisInput, payload: OpenAIAnalysisPayload): 
 }
 
 export async function runOpenAIVisionAnalysis(input: AnalysisInput): Promise<AnalysisOutput> {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured");
+  const openAIConfig = await getOpenAIConfig();
+  if (!openAIConfig.apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured in database or environment variables");
   }
 
   const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: openAIConfig.apiKey,
     timeout: OPENAI_TIMEOUT_MS,
   });
 
   const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL || "gpt-5-mini",
+    model: openAIConfig.model || "gpt-5-mini",
     input: [
       {
         role: "user",

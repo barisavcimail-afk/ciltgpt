@@ -1746,6 +1746,27 @@ async function handleAdminApi(req, res, pathname) {
     const { prisma } = await import("./src/lib/repositories/customerRepository.server.js");
     const { getAdminDashboardStats, getAllSalons, getAdminAnalyses } = await import("./src/lib/repositories/adminRepository.server.js");
 
+    if (pathname === "/api/admin/settings" && req.method === "GET") {
+      const { getPublicSystemSettings } = await import("./src/lib/repositories/systemSettingsRepository.server.js");
+      const settings = await getPublicSystemSettings();
+      sendJson(res, 200, { settings });
+      return;
+    }
+
+    if (pathname === "/api/admin/settings" && req.method === "POST") {
+      const body = await readJsonBody(req);
+      const { getPublicSystemSettings, upsertSystemSetting } = await import("./src/lib/repositories/systemSettingsRepository.server.js");
+      const openAIApiKey = String(body.openAIApiKey || "").trim();
+      const openAIModel = String(body.openAIModel || "gpt-5-mini").trim() || "gpt-5-mini";
+      if (openAIApiKey) {
+        await upsertSystemSetting("OPENAI_API_KEY", openAIApiKey);
+      }
+      await upsertSystemSetting("OPENAI_MODEL", openAIModel);
+      const settings = await getPublicSystemSettings();
+      sendJson(res, 200, { settings, message: "Sistem ayarları başarıyla kaydedildi." });
+      return;
+    }
+
     if (pathname === "/api/admin/stats" && req.method === "GET") {
       const stats = await getAdminDashboardStats();
       sendJson(res, 200, { stats });

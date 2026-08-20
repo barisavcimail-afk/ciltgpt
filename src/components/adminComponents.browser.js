@@ -131,7 +131,10 @@
           <label class="checkbox-row settings-checkbox"><input name="reportPdfEnabled" type="checkbox" ${settings.reportPdfEnabled ? "checked" : ""} /><span>Rapor PDF aktif mi?</span></label>
           <label class="checkbox-row settings-checkbox"><input name="whatsappShareEnabled" type="checkbox" ${settings.whatsappShareEnabled ? "checked" : ""} /><span>WhatsApp paylaşım aktif mi?</span></label>
           <label><span>AI entegrasyonu durumu</span><input name="aiIntegrationStatus" type="text" value="${settings.aiIntegrationStatus}" readonly /></label>
+          <label><span>OpenAI API Key</span><input name="openAIApiKey" type="password" placeholder="Veritabanına kaydetmek için yeni key girin" autocomplete="off" /></label>
+          <label><span>OpenAI Model</span><input name="openAIModel" type="text" value="${settings.openAIModel || "gpt-5-mini"}" /></label>
         </div>
+        <p class="muted" id="admin-openai-status">OpenAI ayar durumu yükleniyor...</p>
         <button class="button" type="submit">Sistem ayarlarını kaydet</button>
       </form>
     `;

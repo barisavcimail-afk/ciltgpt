@@ -40,6 +40,24 @@ ADMIN_LOGIN_PASSWORD=CHANGE_ME
 
 Bu değerler eklenmeden online analiz ekranında `OPENAI_API_KEY is not configured` hatası alınır.
 
+
+## Database Stored OpenAI Settings
+
+OpenAI anahtarı GitHub'a gönderilmez. Uygulama analiz sırasında OpenAI ayarlarını önce veritabanındaki `SystemSetting` tablosundan okur.
+
+Admin panelde `/admin/settings` ekranından şu alanlar kaydedilebilir:
+
+- OpenAI API Key
+- OpenAI Model
+
+Kayıt sonrası veritabanında şu anahtarlar tutulur:
+
+```text
+OPENAI_API_KEY
+OPENAI_MODEL
+```
+
+`SystemSetting` tablosu yoksa uygulama ilk ayar okuma/yazma sırasında tabloyu otomatik oluşturur. Veritabanında key yoksa son çare olarak ortam değişkenleri kullanılır.
 ## Data Access Layer
 
 Mock data su an arayuzu beslemeye devam eder.

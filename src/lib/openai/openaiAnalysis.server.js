@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { getOpenAIConfig } from "../repositories/systemSettingsRepository.server.js";
 
 const OPENAI_TIMEOUT_MS = 60_000;
 const MAX_RECOMMENDED_PRODUCTS_FROM_AI = 4;
@@ -245,12 +246,13 @@ function normalizeOutput(input, payload) {
 }
 
 export async function runOpenAIVisionAnalysis(input) {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured");
+  const openAIConfig = await getOpenAIConfig();
+  if (!openAIConfig.apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured in database or environment variables");
   }
 
   const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: openAIConfig.apiKey,
     timeout: OPENAI_TIMEOUT_MS,
   });
   const imageContent = orderedPhotoEntries(input.photos).map(([, imageUrl]) => ({
@@ -260,7 +262,7 @@ export async function runOpenAIVisionAnalysis(input) {
   }));
 
   const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL || "gpt-5-mini",
+    model: openAIConfig.model || "gpt-5-mini",
     max_output_tokens: 900,
     reasoning: { effort: "minimal" },
     input: [

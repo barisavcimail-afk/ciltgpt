@@ -480,7 +480,7 @@
     return `
       ${adminHeader("Sistem Ayarları", "Platform varsayılanları ve entegrasyon durumları.")}
       <section class="panel">
-        <div id="admin-settings-success" class="success-message" hidden>Sistem ayarları mock olarak kaydedildi.</div>
+        <div id="admin-settings-success" class="success-message" hidden>Sistem ayarları başarıyla kaydedildi.</div>
         ${AdminSettingsForm(data.settings)}
       </section>
     `;
