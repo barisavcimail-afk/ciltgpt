@@ -3688,42 +3688,26 @@
     const downloadButton = document.querySelector("[data-download-pdf]");
     if (downloadButton && downloadButton.dataset.boundReportAction !== "true") {
       downloadButton.dataset.boundReportAction = "true";
-      downloadButton.addEventListener("click", async () => {
-        const reportId = document.querySelector("#report-detail-root")?.dataset.reportId;
-        const message = document.querySelector("#report-action-message");
-        if (!reportId) return;
+      downloadButton.addEventListener("click", () => {
+        const reportPreview = document.querySelector("#report-preview");
+        const reportTitle = document.querySelector(".report-hero h2")?.textContent?.trim() || "ciltgpt-analiz-raporu";
+        const previousTitle = document.title;
+        const filenameTitle = reportTitle
+          .toLocaleLowerCase("tr-TR")
+          .replace(/[^a-z0-9çğıöşü]+/gi, "-")
+          .replace(/^-+|-+$/g, "") || "ciltgpt-analiz-raporu";
 
-        try {
-          downloadButton.disabled = true;
-          const endpoint = currentPath().startsWith("/admin/reports/")
-            ? `/api/admin/reports/${encodeURIComponent(reportId)}/pdf`
-            : `/api/reports/${encodeURIComponent(reportId)}/pdf`;
-          const response = await fetch(endpoint);
-          if (!response.ok) {
-            const payload = await response.json();
-            throw new Error(payload.message || "PDF indirilemedi.");
-          }
-
-          const blob = await response.blob();
-          const disposition = response.headers.get("Content-Disposition") || "";
-          const filenameMatch = disposition.match(/filename="([^"]+)"/);
-          const filename = filenameMatch?.[1] || "ciltgpt-analiz-raporu.pdf";
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
-          URL.revokeObjectURL(url);
-        } catch (error) {
-          if (message) {
-            message.textContent = error instanceof Error ? error.message : "PDF indirilemedi.";
-            message.hidden = false;
-          }
-        } finally {
-          downloadButton.disabled = false;
-        }
+        if (!reportPreview) return;
+        document.title = filenameTitle + "-analiz-raporu";
+        document.body.classList.add("printing-report");
+        const cleanup = () => {
+          document.body.classList.remove("printing-report");
+          document.title = previousTitle;
+          window.removeEventListener("afterprint", cleanup);
+        };
+        window.addEventListener("afterprint", cleanup);
+        window.print();
+        window.setTimeout(cleanup, 1200);
       });
     }
 

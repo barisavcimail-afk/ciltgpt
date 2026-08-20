@@ -2832,7 +2832,17 @@ details .customer-form {
   }
 }
 
+@page {
+  size: A4;
+  margin: 0;
+}
+
 @media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   .sidebar,
   .page-header .button {
     display: none;
