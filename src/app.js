@@ -4288,6 +4288,10 @@
         typedCommand = "";
         navigate("/firm-login");
       }
+      if (typedCommand.endsWith("salon")) {
+        typedCommand = "";
+        navigate("/login");
+      }
     });
   }
 
@@ -4582,5 +4586,6 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
 
 
