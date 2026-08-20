@@ -22,6 +22,24 @@ npm run seed
 
 Not: Mevcut ekranlar henüz veritabanına bağlanmadı; mock data dosyaları çalışmaya devam eder.
 
+## Online Environment Setup
+
+GitHub'a `.env` dosyası gönderilmez. Lokal çalışan OpenAI anahtarı online ortamda otomatik gelmez.
+
+Vercel veya sunucuda Environment Variables bölümüne şu değerler eklenmelidir:
+
+```env
+ANALYSIS_PROVIDER=openaiVision
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+OPENAI_MODEL=gpt-5-mini
+DATABASE_URL=YOUR_PRODUCTION_DATABASE_URL
+SESSION_SECRET=CHANGE_ME_LONG_RANDOM_VALUE
+SALON_LOGIN_PASSWORD=CHANGE_ME
+ADMIN_LOGIN_PASSWORD=CHANGE_ME
+```
+
+Bu değerler eklenmeden online analiz ekranında `OPENAI_API_KEY is not configured` hatası alınır.
+
 ## Data Access Layer
 
 Mock data su an arayuzu beslemeye devam eder.
