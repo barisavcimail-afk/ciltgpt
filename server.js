@@ -541,6 +541,10 @@ function pdfTextLine(text, x, y, size = 10, font = "F1") {
   return `BT /${font} ${size} Tf ${x} ${y} Td (${escapePdfText(text)}) Tj ET`;
 }
 
+function pdfColoredTextLine(text, x, y, size = 10, font = "F1", color = [0, 0, 0]) {
+  return `q ${color.join(" ")} rg BT /${font} ${size} Tf ${x} ${y} Td (${escapePdfText(text)}) Tj ET Q`;
+}
+
 function pdfFillRect(x, y, width, height, color = [1, 1, 1]) {
   return `q ${color.join(" ")} rg ${x} ${y} ${width} ${height} re f Q`;
 }
@@ -551,6 +555,48 @@ function pdfStrokeRect(x, y, width, height, color = [0.85, 0.89, 0.87], lineWidt
 
 function pdfLine(x1, y1, x2, y2, color = [0.89, 0.93, 0.91], lineWidth = 1) {
   return `q ${lineWidth} w ${color.join(" ")} RG ${x1} ${y1} m ${x2} ${y2} l S Q`;
+}
+
+function pdfRoundedRectPath(x, y, width, height, radius = 10) {
+  const r = Math.min(radius, width / 2, height / 2);
+  const c = 0.5522847498;
+  return [
+    `${x + r} ${y} m`,
+    `${x + width - r} ${y} l`,
+    `${x + width - r + r * c} ${y} ${x + width} ${y + r - r * c} ${x + width} ${y + r} c`,
+    `${x + width} ${y + height - r} l`,
+    `${x + width} ${y + height - r + r * c} ${x + width - r + r * c} ${y + height} ${x + width - r} ${y + height} c`,
+    `${x + r} ${y + height} l`,
+    `${x + r - r * c} ${y + height} ${x} ${y + height - r + r * c} ${x} ${y + height - r} c`,
+    `${x} ${y + r} l`,
+    `${x} ${y + r - r * c} ${x + r - r * c} ${y} ${x + r} ${y} c`,
+    "h",
+  ].join(" ");
+}
+
+function pdfFillRoundedRect(x, y, width, height, radius = 10, color = [1, 1, 1]) {
+  return `q ${color.join(" ")} rg ${pdfRoundedRectPath(x, y, width, height, radius)} f Q`;
+}
+
+function pdfStrokeRoundedRect(x, y, width, height, radius = 10, color = [0.85, 0.89, 0.87], lineWidth = 1) {
+  return `q ${lineWidth} w ${color.join(" ")} RG ${pdfRoundedRectPath(x, y, width, height, radius)} S Q`;
+}
+
+function pdfCirclePath(cx, cy, radius) {
+  const c = 0.5522847498;
+  const r = radius;
+  return [
+    `${cx + r} ${cy} m`,
+    `${cx + r} ${cy + r * c} ${cx + r * c} ${cy + r} ${cx} ${cy + r} c`,
+    `${cx - r * c} ${cy + r} ${cx - r} ${cy + r * c} ${cx - r} ${cy} c`,
+    `${cx - r} ${cy - r * c} ${cx - r * c} ${cy - r} ${cx} ${cy - r} c`,
+    `${cx + r * c} ${cy - r} ${cx + r} ${cy - r * c} ${cx + r} ${cy} c`,
+    "h",
+  ].join(" ");
+}
+
+function pdfFillCircle(cx, cy, radius, color = [0.02, 0.31, 0.22]) {
+  return `q ${color.join(" ")} rg ${pdfCirclePath(cx, cy, radius)} f Q`;
 }
 
 const pdfPasswordPadding = Buffer.from([
@@ -704,118 +750,122 @@ function createReportPdf(report) {
   const footerNote = branding.reportFooter || "Bu rapor kozmetik bakım önerisi amacıyla hazırlanmıştır.";
   const protocol = data.recommendedProtocol || {};
   const products = Array.isArray(data.recommendedProducts) ? data.recommendedProducts : [];
+  const customerName = String(data.customerName || "-").toLocaleLowerCase("tr-TR");
   const pages = [];
   let lines = [];
   const page = { width: 595, height: 842 };
-  const content = { x: 46, width: 503 };
-  const green = [0.14, 0.63, 0.41];
-  const greenSoft = [0.9, 0.96, 0.92];
-  const greenPanel = [0.97, 0.99, 0.98];
+  const content = { x: 42, width: 511 };
+  const green = [0.08, 0.55, 0.32];
+  const deepGreen = [0.03, 0.25, 0.18];
+  const gold = [0.72, 0.58, 0.32];
+  const greenSoft = [0.93, 0.98, 0.95];
   const paper = [1, 1, 1];
-  const background = [0.94, 0.97, 0.95];
-  const border = [0.84, 0.89, 0.86];
-  const subtleBorder = [0.9, 0.94, 0.91];
+  const background = [0.96, 0.98, 0.97];
+  const border = [0.86, 0.92, 0.88];
   let y = 0;
 
   const textLine = (value, x, textY, size = 10, font = "F1") => {
     lines.push(pdfTextLine(value, x, textY, size, font));
   };
-  const box = (x, boxY, width, height, fill = paper, stroke = subtleBorder) => {
-    lines.push(pdfFillRect(x, boxY, width, height, fill));
-    lines.push(pdfStrokeRect(x, boxY, width, height, stroke, 1));
+  const roundedBox = (x, boxY, width, height, radius = 10, fill = paper, stroke = border) => {
+    lines.push(pdfFillRoundedRect(x, boxY, width, height, radius, fill));
+    lines.push(pdfStrokeRoundedRect(x, boxY, width, height, radius, stroke, 1));
   };
   const startPage = () => {
     lines = [];
     pages.push(lines);
     lines.push(pdfFillRect(0, 0, page.width, page.height, background));
-    lines.push(pdfFillRect(24, 24, 547, 794, paper));
-    lines.push(pdfStrokeRect(24, 24, 547, 794, border, 1));
-    y = 780;
+    lines.push(pdfFillRect(30, 24, 535, 794, paper));
+    lines.push(pdfStrokeRect(30, 24, 535, 794, [0.88, 0.93, 0.9], 1));
+    y = 775;
   };
   const ensureSpace = (height) => {
-    if (y - height < 72) startPage();
+    if (y - height < 66) startPage();
   };
   const sectionTitle = (title) => {
-    ensureSpace(40);
-    textLine(title, content.x, y, 14, "F2");
-    y -= 20;
+    ensureSpace(42);
+    lines.push(pdfColoredTextLine(title, content.x, y, 16, "F2", green));
+    y -= 24;
   };
-  const paragraph = (value, x, startY, maxLength = 86, size = 9, gap = 13, font = "F1") => {
+  const paragraph = (value, x, startY, maxLength = 80, size = 10, gap = 15, font = "F1") => {
     const linesToRender = wrapPdfText(value, maxLength);
     linesToRender.forEach((line, index) => textLine(line, x, startY - index * gap, size, index === 0 ? font : "F1"));
     return linesToRender.length * gap;
   };
   const infoCard = (x, boxY, width, label, value) => {
-    box(x, boxY, width, 54, greenPanel);
-    textLine(label, x + 12, boxY + 34, 8, "F2");
-    textLine(value, x + 12, boxY + 15, 12, "F2");
+    roundedBox(x, boxY, width, 72, 11, paper);
+    textLine(label, x + 14, boxY + 45, 10, "F2");
+    textLine(value, x + 14, boxY + 23, 15, "F2");
   };
   const scoreCard = (x, boxY, width, label, value) => {
     const score = Math.min(Math.max(Number(value) || 0, 0), 100);
-    box(x, boxY, width, 58, paper);
-    textLine(label, x + 12, boxY + 39, 8, "F1");
-    textLine(`${score}/100`, x + 12, boxY + 20, 15, "F2");
-    lines.push(pdfFillRect(x + 12, boxY + 10, width - 24, 5, [0.91, 0.94, 0.92]));
-    lines.push(pdfFillRect(x + 12, boxY + 10, Math.max(8, (width - 24) * (score / 100)), 5, green));
+    roundedBox(x, boxY, width, 72, 11, paper);
+    textLine(label, x + 13, boxY + 48, 10, "F2");
+    textLine(`${score}/100`, x + 13, boxY + 24, 15, "F2");
+    lines.push(pdfFillRoundedRect(x + 13, boxY + 12, width - 26, 7, 3, [0.91, 0.94, 0.92]));
+    lines.push(pdfFillRoundedRect(x + 13, boxY + 12, Math.max(8, (width - 26) * (score / 100)), 7, 3, green));
   };
 
   startPage();
-  lines.push(pdfFillRect(content.x, y - 20, 60, 60, greenSoft));
-  lines.push(pdfStrokeRect(content.x, y - 20, 60, 60, border, 1));
-  textLine("Logo", content.x + 17, y + 12, 11, "F2");
-  textLine(salonName, content.x + 76, y + 24, 22, "F2");
-  textLine([salonCity, salonPhone].filter(Boolean).join(" - "), content.x + 76, y + 3, 10, "F1");
-  lines.push(pdfLine(content.x, y - 36, content.x + content.width, y - 36, [0.86, 0.91, 0.88], 1));
-  y -= 62;
+  lines.push(pdfFillCircle(content.x + 34, y - 10, 28, deepGreen));
+  lines.push(pdfColoredTextLine("BB", content.x + 17, y - 18, 22, "F2", gold));
+  lines.push(pdfColoredTextLine(salonName, content.x + 78, y + 4, 22, "F2", deepGreen));
+  textLine([salonCity, salonPhone].filter(Boolean).join(" - "), content.x + 79, y - 22, 14, "F1");
+  lines.push(pdfLine(content.x, y - 52, content.x + content.width, y - 52, [0.86, 0.91, 0.88], 1));
+  y -= 88;
 
-  infoCard(content.x, y - 54, 192, "Musteri", data.customerName);
-  infoCard(content.x + 207, y - 54, 142, "Analiz tarihi", date);
-  infoCard(content.x + 364, y - 54, 139, "Genel cilt skoru", `${data.overallScore}/100`);
-  y -= 82;
+  infoCard(content.x, y - 72, 178, "Musteri", customerName);
+  infoCard(content.x + 198, y - 72, 154, "Analiz tarihi", date);
+  infoCard(content.x + 372, y - 72, 139, "Genel cilt skoru", `${data.overallScore}/100`);
+  y -= 100;
 
   sectionTitle("Rapor Ozeti");
-  const summaryHeight = 74;
-  box(content.x, y - summaryHeight, content.width, summaryHeight, greenPanel);
-  paragraph(`${data.customerName} icin hazirlanan bu kozmetik cilt analizinde ${data.skinType} cilt tipi ve ${data.complaint} ana sikayeti dikkate alinmistir.`, content.x + 14, y - 20, 90, 9, 13);
-  textLine(`Yas: ${data.age || "-"} - Durum: ${data.status}`, content.x + 14, y - 58, 9, "F1");
-  y -= summaryHeight + 26;
+  const summaryText = `${customerName} icin hazirlanan bu kozmetik cilt analizinde ${data.skinType} cilt tipi ve ${data.complaint} ana sikayeti dikkate alinmistir.`;
+  const summaryLines = wrapPdfText(summaryText, 77);
+  const summaryHeight = Math.max(116, 58 + summaryLines.length * 17);
+  roundedBox(content.x, y - summaryHeight, content.width, summaryHeight, 12, paper);
+  paragraph(summaryText, content.x + 18, y - 34, 77, 13, 18, "F2");
+  textLine(`Yas: ${data.age || "-"} - Durum: ${data.status}`, content.x + 18, y - summaryHeight + 34, 12, "F1");
+  y -= summaryHeight + 28;
 
   sectionTitle("Skor Kartlari");
+  const scoreSectionHeight = 228;
+  roundedBox(content.x, y - scoreSectionHeight, content.width, scoreSectionHeight, 12, paper);
   const scores = [["Genel cilt skoru", data.overallScore], ...Object.entries(data.scores || {})];
   scores.forEach(([label, value], index) => {
     const column = index % 3;
     const row = Math.floor(index / 3);
-    const x = content.x + column * 169;
-    const boxY = y - 58 - row * 72;
-    scoreCard(x, boxY, 154, label, value);
+    const x = content.x + 19 + column * 168;
+    const boxY = y - 95 - row * 86;
+    scoreCard(x, boxY, 150, label, value);
   });
-  y -= Math.ceil(scores.length / 3) * 72 + 26;
+  y -= scoreSectionHeight + 34;
 
-  ensureSpace(150);
+  ensureSpace(185);
   sectionTitle("AI Yorum");
-  const aiLines = wrapPdfText(data.aiComment, 88);
-  const aiHeight = Math.max(76, 28 + aiLines.length * 13);
-  box(content.x, y - aiHeight, content.width, aiHeight, paper);
-  paragraph(data.aiComment, content.x + 14, y - 20, 88, 9, 13);
-  y -= aiHeight + 26;
+  const aiLines = wrapPdfText(data.aiComment, 78);
+  const aiHeight = Math.max(145, 40 + aiLines.length * 15);
+  roundedBox(content.x, y - aiHeight, content.width, aiHeight, 10, paper);
+  paragraph(data.aiComment, content.x + 18, y - 28, 78, 10, 15);
+  y -= aiHeight + 28;
 
   const protocolName = protocol.name || "Protokol onerisi";
   const protocolSessions = protocol.sessions || protocol.sessionCount || "-";
   const protocolFrequency = protocol.frequency || "-";
   const protocolNote = protocol.salonNote || "Cilt skorlari ve uzman degerlendirmesi dogrultusunda, onerilen kabin protokolu salon uzmaniniz tarafindan kisiye ozel olarak guncellenebilir.";
   const protocolText = `${protocolName}. Seans sayisi: ${protocolSessions}. Siklik: ${protocolFrequency}. ${protocolNote}`;
-  const protocolLines = wrapPdfText(protocolText, 88);
-  const protocolHeight = Math.max(86, 30 + protocolLines.length * 13);
-  ensureSpace(protocolHeight + 46);
+  const protocolLines = wrapPdfText(protocolText, 78);
+  const protocolHeight = Math.max(116, 40 + protocolLines.length * 15);
+  ensureSpace(protocolHeight + 60);
   sectionTitle("Onerilen Kabin Protokolu");
-  box(content.x, y - protocolHeight, content.width, protocolHeight, greenPanel);
-  paragraph(protocolText, content.x + 14, y - 22, 88, 9, 13, "F2");
-  y -= protocolHeight + 26;
+  roundedBox(content.x, y - protocolHeight, content.width, protocolHeight, 10, greenSoft);
+  paragraph(protocolText, content.x + 18, y - 28, 78, 10, 15, "F2");
+  y -= protocolHeight + 28;
 
-  ensureSpace(140);
+  ensureSpace(160);
   sectionTitle("Onerilen Ev Devam Urunleri");
-  textLine("Bu urunler salonunuz tarafindan musteriye ev devam bakimi olarak onerilebilir.", content.x, y, 9, "F1");
-  y -= 18;
+  textLine("Bu urunler salonunuz tarafindan musteriye ev devam bakimi olarak onerilebilir.", content.x, y, 10, "F1");
+  y -= 22;
   const productRows = products.length
     ? products
     : [{ name: "Urun onerisi bulunmuyor", time: "", purpose: "", salesNote: "" }];
@@ -823,20 +873,20 @@ function createReportPdf(report) {
     const details = [product.time, product.purpose].filter(Boolean).join(" - ");
     const salesNote = product.salesNote ? ` ${product.salesNote}` : "";
     const productText = `${product.name || "Urun"}${details ? ` - ${details}` : ""}${salesNote}`;
-    const productLines = wrapPdfText(productText, 86);
-    const productHeight = Math.max(42, 18 + productLines.length * 12);
+    const productLines = wrapPdfText(productText, 78);
+    const productHeight = Math.max(54, 26 + productLines.length * 14);
     ensureSpace(productHeight + 14);
-    box(content.x, y - productHeight, content.width, productHeight, paper);
-    productLines.forEach((line, index) => textLine(line, content.x + 14, y - 16 - index * 12, 9, index === 0 ? "F2" : "F1"));
-    y -= productHeight + 9;
+    roundedBox(content.x, y - productHeight, content.width, productHeight, 10, paper);
+    productLines.forEach((line, index) => textLine(line, content.x + 16, y - 18 - index * 14, 10, index === 0 ? "F2" : "F1"));
+    y -= productHeight + 10;
   });
 
-  ensureSpace(96);
+  ensureSpace(110);
   sectionTitle("Salon Iletisim");
-  box(content.x, y - 72, content.width, 72, greenPanel);
-  textLine(`WhatsApp: ${salonWhatsapp} - ${salonEmail || "-"}`, content.x + 14, y - 20, 9, "F2");
-  paragraph(salonAddress || "Adres bilgisi bulunmuyor", content.x + 14, y - 38, 90, 8, 11);
-  paragraph(footerNote, content.x + 14, y - 55, 90, 8, 11);
+  roundedBox(content.x, y - 82, content.width, 82, 10, greenSoft);
+  textLine(`WhatsApp: ${salonWhatsapp} - ${salonEmail || "-"}`, content.x + 16, y - 23, 10, "F2");
+  paragraph(salonAddress || "Adres bilgisi bulunmuyor", content.x + 16, y - 42, 82, 9, 12);
+  paragraph(footerNote, content.x + 16, y - 62, 82, 9, 12);
 
   const pdfPassword = getReportPdfPassword(report);
   return createSimplePdf(pages, { password: pdfPassword });
@@ -3268,6 +3318,9 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
+
+
+
 
 
 
