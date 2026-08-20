@@ -4280,15 +4280,15 @@
       if (event.key.length !== 1) return;
 
       typedCommand = (typedCommand + event.key).toLocaleLowerCase("tr-TR").slice(-10);
-      if (typedCommand.endsWith("admin")) {
+      if (typedCommand.endsWith("adm")) {
         typedCommand = "";
         navigate("/admin-login");
       }
-      if (typedCommand.endsWith("firma")) {
+      if (typedCommand.endsWith("frm")) {
         typedCommand = "";
         navigate("/firm-login");
       }
-      if (typedCommand.endsWith("salon")) {
+      if (typedCommand.endsWith("sln")) {
         typedCommand = "";
         navigate("/login");
       }
@@ -4586,6 +4586,7 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
 
 
 
