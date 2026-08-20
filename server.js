@@ -1,8 +1,8 @@
-﻿import { createServer } from "node:http";
+import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
 const port = Number(process.env.PORT || 3000);
 const root = process.cwd();
@@ -553,46 +553,140 @@ function pdfLine(x1, y1, x2, y2, color = [0.89, 0.93, 0.91], lineWidth = 1) {
   return `q ${lineWidth} w ${color.join(" ")} RG ${x1} ${y1} m ${x2} ${y2} l S Q`;
 }
 
-function createSimplePdf(linesOrPages) {
+const pdfPasswordPadding = Buffer.from([
+  0x28, 0xbf, 0x4e, 0x5e, 0x4e, 0x75, 0x8a, 0x41,
+  0x64, 0x00, 0x4e, 0x56, 0xff, 0xfa, 0x01, 0x08,
+  0x2e, 0x2e, 0x00, 0xb6, 0xd0, 0x68, 0x3e, 0x80,
+  0x2f, 0x0c, 0xa9, 0xfe, 0x64, 0x53, 0x69, 0x7a,
+]);
+
+function md5(buffer) {
+  return createHash("md5").update(buffer).digest();
+}
+
+function rc4(key, data) {
+  const state = Array.from({ length: 256 }, (_, index) => index);
+  let j = 0;
+
+  for (let i = 0; i < 256; i += 1) {
+    j = (j + state[i] + key[i % key.length]) & 255;
+    [state[i], state[j]] = [state[j], state[i]];
+  }
+
+  const output = Buffer.alloc(data.length);
+  let i = 0;
+  j = 0;
+
+  for (let offset = 0; offset < data.length; offset += 1) {
+    i = (i + 1) & 255;
+    j = (j + state[i]) & 255;
+    [state[i], state[j]] = [state[j], state[i]];
+    const k = state[(state[i] + state[j]) & 255];
+    output[offset] = data[offset] ^ k;
+  }
+
+  return output;
+}
+
+function padPdfPassword(password) {
+  const source = Buffer.from(String(password || ""), "latin1");
+  if (source.length >= 32) return source.subarray(0, 32);
+  return Buffer.concat([source, pdfPasswordPadding]).subarray(0, 32);
+}
+
+function createPdfEncryption(password) {
+  if (!password) return null;
+  const userPassword = padPdfPassword(password);
+  const ownerPassword = padPdfPassword(password);
+  const ownerKey = md5(ownerPassword).subarray(0, 5);
+  const ownerEntry = rc4(ownerKey, userPassword);
+  const permissions = -4;
+  const permissionsBuffer = Buffer.alloc(4);
+  permissionsBuffer.writeInt32LE(permissions, 0);
+  const fileId = randomBytes(16);
+  const encryptionKey = md5(Buffer.concat([userPassword, ownerEntry, permissionsBuffer, fileId])).subarray(0, 5);
+  const userEntry = rc4(encryptionKey, pdfPasswordPadding);
+
+  return {
+    dictionary: `<< /Filter /Standard /V 1 /R 2 /Length 40 /O <${ownerEntry.toString("hex")}> /U <${userEntry.toString("hex")}> /P ${permissions} >>`,
+    encryptStream(objectNumber, data) {
+      const objectBytes = Buffer.from([
+        objectNumber & 255,
+        (objectNumber >> 8) & 255,
+        (objectNumber >> 16) & 255,
+        0,
+        0,
+      ]);
+      const objectKey = md5(Buffer.concat([encryptionKey, objectBytes])).subarray(0, 10);
+      return rc4(objectKey, data);
+    },
+    fileId: fileId.toString("hex"),
+  };
+}
+
+function createSimplePdf(linesOrPages, options = {}) {
   const pages = Array.isArray(linesOrPages[0]) ? linesOrPages : [linesOrPages];
   const pageObjectIds = pages.map((_, index) => 5 + index * 2);
+  const encryption = createPdfEncryption(options.password);
   const objects = [
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pages.length} >>`,
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
+    { body: "<< /Type /Catalog /Pages 2 0 R >>" },
+    { body: `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(" ")}] /Count ${pages.length} >>` },
+    { body: "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>" },
+    { body: "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>" },
   ];
 
   pages.forEach((pageLines, index) => {
     const pageObjectId = pageObjectIds[index];
     const contentObjectId = pageObjectId + 1;
-    const content = pageLines.join("\n");
-    const contentLength = Buffer.byteLength(content, "utf8");
+    const content = Buffer.from(pageLines.join("\n"), "utf8");
     objects.push(
-      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjectId} 0 R >>`,
-      `<< /Length ${contentLength} >>\nstream\n${content}\nendstream`,
+      { body: `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjectId} 0 R >>` },
+      { stream: content },
     );
   });
 
-  let pdf = "%PDF-1.4\n";
+  if (encryption) objects.push({ body: encryption.dictionary });
+
+  const chunks = [Buffer.from("%PDF-1.4\n", "latin1")];
   const offsets = [0];
+  let byteLength = chunks[0].length;
 
   objects.forEach((object, index) => {
-    offsets.push(Buffer.byteLength(pdf, "utf8"));
-    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+    const objectNumber = index + 1;
+    offsets.push(byteLength);
+    const header = Buffer.from(`${objectNumber} 0 obj\n`, "latin1");
+    chunks.push(header);
+    byteLength += header.length;
+
+    if (object.stream) {
+      const stream = encryption ? encryption.encryptStream(objectNumber, object.stream) : object.stream;
+      const streamHeader = Buffer.from(`<< /Length ${stream.length} >>\nstream\n`, "latin1");
+      const streamFooter = Buffer.from("\nendstream", "latin1");
+      chunks.push(streamHeader, stream, streamFooter);
+      byteLength += streamHeader.length + stream.length + streamFooter.length;
+    } else {
+      const body = Buffer.from(object.body, "latin1");
+      chunks.push(body);
+      byteLength += body.length;
+    }
+
+    const footer = Buffer.from("\nendobj\n", "latin1");
+    chunks.push(footer);
+    byteLength += footer.length;
   });
 
-  const xrefOffset = Buffer.byteLength(pdf, "utf8");
-  pdf += `xref\n0 ${objects.length + 1}\n`;
-  pdf += "0000000000 65535 f \n";
+  const xrefOffset = byteLength;
+  const xrefChunks = [Buffer.from(`xref\n0 ${objects.length + 1}\n`, "latin1"), Buffer.from("0000000000 65535 f \n", "latin1")];
   for (let index = 1; index <= objects.length; index += 1) {
-    pdf += `${String(offsets[index]).padStart(10, "0")} 00000 n \n`;
+    xrefChunks.push(Buffer.from(`${String(offsets[index]).padStart(10, "0")} 00000 n \n`, "latin1"));
   }
-  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
 
-  return Buffer.from(pdf, "utf8");
+  const encryptObjectNumber = encryption ? objects.length : null;
+  const idTrailer = encryption ? ` /Encrypt ${encryptObjectNumber} 0 R /ID [<${encryption.fileId}> <${encryption.fileId}>]` : "";
+  xrefChunks.push(Buffer.from(`trailer\n<< /Size ${objects.length + 1} /Root 1 0 R${idTrailer} >>\nstartxref\n${xrefOffset}\n%%EOF`, "latin1"));
+
+  return Buffer.concat([...chunks, ...xrefChunks]);
 }
-
 function createReportPdf(report) {
   const data = databaseReportResponse(report);
   const date = new Date(data.analysisDate).toLocaleDateString("tr-TR");
@@ -742,7 +836,8 @@ function createReportPdf(report) {
   text(`WhatsApp: ${salonPhone || "-"} - ${report.salon?.email || ""}`, content.x + 95, footerY, 9, "F1");
   text("Bu rapor salon uzmani degerlendirmesiyle birlikte yorumlanmalidir.", content.x, footerY - 14, 8, "F1");
 
-  return createSimplePdf(pages);
+  const pdfPassword = getReportPdfPassword(report);
+  return createSimplePdf(pages, { password: pdfPassword });
 }
 
 function safeFileName(value) {
@@ -753,6 +848,13 @@ function safeFileName(value) {
     .slice(0, 80) || "ciltgpt-rapor";
 }
 
+function getReportPdfPassword(report) {
+  const phone = report.analysis?.customer?.phone || report.customer?.phone || "";
+  const digits = String(phone).replace(/\D/g, "");
+  if (digits.length >= 4) return digits.slice(-4);
+  const fallback = String(report.id || "0000").replace(/\D/g, "").slice(-4);
+  return fallback.padStart(4, "0");
+}
 function scoreMapFromReport(report) {
   if (!report) {
     return {
@@ -3165,4 +3267,6 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
+
+
 

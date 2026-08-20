@@ -3721,6 +3721,13 @@
           link.click();
           link.remove();
           URL.revokeObjectURL(url);
+          if (message) {
+            message.textContent = "PDF şifresi müşterinin telefon numarasının son 4 hanesidir.";
+            message.hidden = false;
+            setTimeout(() => {
+              message.hidden = true;
+            }, 5000);
+          }
         } catch (error) {
           if (message) {
             message.textContent = error instanceof Error ? error.message : "PDF oluşturulurken bir hata oluştu.";
@@ -4610,6 +4617,7 @@
   window.addEventListener("hashchange", render);
   render();
 })();
+
 
 
 
