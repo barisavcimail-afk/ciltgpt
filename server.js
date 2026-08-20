@@ -689,157 +689,158 @@ function createSimplePdf(linesOrPages, options = {}) {
 }
 function createReportPdf(report) {
   const data = databaseReportResponse(report);
-  const date = new Date(data.analysisDate).toLocaleDateString("tr-TR");
-  const salonName = report.salon?.name || "CiltGPT Salon";
-  const salonPhone = report.salon?.phone || "";
-  const salonCity = report.salon?.city || "";
+  const date = new Date(data.analysisDate).toLocaleDateString("tr-TR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  const branding = data.salonBranding || {};
+  const salonName = branding.reportSalonName || branding.salonName || report.salon?.name || "CiltGPT Salon";
+  const salonPhone = branding.phone || report.salon?.phone || "";
+  const salonWhatsapp = branding.whatsapp || salonPhone || "-";
+  const salonEmail = branding.email || report.salon?.email || "";
+  const salonCity = branding.city || report.salon?.city || "";
+  const salonAddress = branding.address || report.salon?.address || "";
+  const footerNote = branding.reportFooter || "Bu rapor kozmetik bakım önerisi amacıyla hazırlanmıştır.";
+  const protocol = data.recommendedProtocol || {};
+  const products = Array.isArray(data.recommendedProducts) ? data.recommendedProducts : [];
   const pages = [];
   let lines = [];
   const page = { width: 595, height: 842 };
-  const card = { x: 36, y: 38, width: 523, height: 766 };
-  const content = { x: 58, width: 479 };
+  const content = { x: 46, width: 503 };
+  const green = [0.14, 0.63, 0.41];
   const greenSoft = [0.9, 0.96, 0.92];
-  const greenPanel = [0.96, 0.98, 0.97];
-  const border = [0.85, 0.89, 0.87];
-  const subtleBorder = [0.91, 0.94, 0.92];
-  const ink = [0.09, 0.13, 0.11];
-  const muted = [0.33, 0.38, 0.35];
-  let y = 778;
+  const greenPanel = [0.97, 0.99, 0.98];
+  const paper = [1, 1, 1];
+  const background = [0.94, 0.97, 0.95];
+  const border = [0.84, 0.89, 0.86];
+  const subtleBorder = [0.9, 0.94, 0.91];
+  let y = 0;
 
-  const drawPageFrame = (showHeader = false) => {
-    lines.push(pdfFillRect(0, 0, page.width, page.height, [0.97, 0.98, 0.97]));
-    lines.push(pdfFillRect(card.x, card.y, card.width, card.height, [1, 1, 1]));
-    lines.push(pdfStrokeRect(card.x, card.y, card.width, card.height, border, 1));
-
-    if (showHeader) {
-      lines.push(pdfFillRect(content.x, 724, 72, 72, greenSoft));
-      lines.push(pdfStrokeRect(content.x, 724, 72, 72, border, 1));
-      lines.push(pdfTextLine("Logo", content.x + 21, 759, 12, "F2"));
-      lines.push(pdfTextLine(salonName, 148, 770, 22, "F2"));
-      lines.push(pdfTextLine([salonCity, salonPhone].filter(Boolean).join(" - "), 148, 748, 10, "F1"));
-      lines.push(pdfLine(content.x, 708, content.x + content.width, 708, [0.89, 0.93, 0.91], 1));
-      y = 680;
-      return;
-    }
-
-    lines.push(pdfTextLine("CiltGPT Analiz Raporu", content.x, 770, 16, "F2"));
-    lines.push(pdfTextLine(data.customerName, content.x, 750, 10, "F1"));
-    lines.push(pdfLine(content.x, 724, content.x + content.width, 724, [0.89, 0.93, 0.91], 1));
-    y = 700;
-  };
-
-  const startPage = (showHeader = false) => {
-    lines = [];
-    pages.push(lines);
-    drawPageFrame(showHeader);
-  };
-
-  const ensureSpace = (requiredHeight) => {
-    if (y - requiredHeight < 92) {
-      startPage(false);
-    }
-  };
-
-  const text = (value, x, textY, size = 10, font = "F1") => {
+  const textLine = (value, x, textY, size = 10, font = "F1") => {
     lines.push(pdfTextLine(value, x, textY, size, font));
   };
-  const cardBox = (x, boxY, width, height, fill = [0.98, 0.99, 0.98]) => {
+  const box = (x, boxY, width, height, fill = paper, stroke = subtleBorder) => {
     lines.push(pdfFillRect(x, boxY, width, height, fill));
-    lines.push(pdfStrokeRect(x, boxY, width, height, subtleBorder, 1));
+    lines.push(pdfStrokeRect(x, boxY, width, height, stroke, 1));
+  };
+  const startPage = () => {
+    lines = [];
+    pages.push(lines);
+    lines.push(pdfFillRect(0, 0, page.width, page.height, background));
+    lines.push(pdfFillRect(24, 24, 547, 794, paper));
+    lines.push(pdfStrokeRect(24, 24, 547, 794, border, 1));
+    y = 780;
+  };
+  const ensureSpace = (height) => {
+    if (y - height < 72) startPage();
   };
   const sectionTitle = (title) => {
-    y -= 18;
-    lines.push(pdfLine(content.x, y + 10, content.x + content.width, y + 10, [0.93, 0.95, 0.94], 1));
-    text(title, content.x, y - 6, 14, "F2");
-    y -= 24;
+    ensureSpace(40);
+    textLine(title, content.x, y, 14, "F2");
+    y -= 20;
   };
-  const wrappedParagraph = (value, x, startY, maxLength = 82, size = 9, lineGap = 13, font = "F1") => {
-    const paragraphLines = wrapPdfText(value, maxLength);
-    paragraphLines.forEach((line, index) => {
-      text(line, x, startY - index * lineGap, size, index === 0 ? font : "F1");
-    });
-    return paragraphLines.length * lineGap;
+  const paragraph = (value, x, startY, maxLength = 86, size = 9, gap = 13, font = "F1") => {
+    const linesToRender = wrapPdfText(value, maxLength);
+    linesToRender.forEach((line, index) => textLine(line, x, startY - index * gap, size, index === 0 ? font : "F1"));
+    return linesToRender.length * gap;
   };
-  const statCard = (x, boxY, width, label, value) => {
-    cardBox(x, boxY, width, 52, [0.985, 0.99, 0.985]);
-    text(label, x + 12, boxY + 34, 8, "F2");
-    text(value, x + 12, boxY + 15, 13, "F2");
+  const infoCard = (x, boxY, width, label, value) => {
+    box(x, boxY, width, 54, greenPanel);
+    textLine(label, x + 12, boxY + 34, 8, "F2");
+    textLine(value, x + 12, boxY + 15, 12, "F2");
+  };
+  const scoreCard = (x, boxY, width, label, value) => {
+    const score = Math.min(Math.max(Number(value) || 0, 0), 100);
+    box(x, boxY, width, 58, paper);
+    textLine(label, x + 12, boxY + 39, 8, "F1");
+    textLine(`${score}/100`, x + 12, boxY + 20, 15, "F2");
+    lines.push(pdfFillRect(x + 12, boxY + 10, width - 24, 5, [0.91, 0.94, 0.92]));
+    lines.push(pdfFillRect(x + 12, boxY + 10, Math.max(8, (width - 24) * (score / 100)), 5, green));
   };
 
-  startPage(true);
-  const infoWidth = 149;
-  statCard(content.x, 644, infoWidth, "Musteri", data.customerName);
-  statCard(content.x + 165, 644, infoWidth, "Analiz tarihi", date);
-  statCard(content.x + 330, 644, infoWidth, "Genel cilt skoru", `${data.overallScore}/100`);
-  y = 620;
+  startPage();
+  lines.push(pdfFillRect(content.x, y - 20, 60, 60, greenSoft));
+  lines.push(pdfStrokeRect(content.x, y - 20, 60, 60, border, 1));
+  textLine("Logo", content.x + 17, y + 12, 11, "F2");
+  textLine(salonName, content.x + 76, y + 24, 22, "F2");
+  textLine([salonCity, salonPhone].filter(Boolean).join(" - "), content.x + 76, y + 3, 10, "F1");
+  lines.push(pdfLine(content.x, y - 36, content.x + content.width, y - 36, [0.86, 0.91, 0.88], 1));
+  y -= 62;
+
+  infoCard(content.x, y - 54, 192, "Musteri", data.customerName);
+  infoCard(content.x + 207, y - 54, 142, "Analiz tarihi", date);
+  infoCard(content.x + 364, y - 54, 139, "Genel cilt skoru", `${data.overallScore}/100`);
+  y -= 82;
+
+  sectionTitle("Rapor Ozeti");
+  const summaryHeight = 74;
+  box(content.x, y - summaryHeight, content.width, summaryHeight, greenPanel);
+  paragraph(`${data.customerName} icin hazirlanan bu kozmetik cilt analizinde ${data.skinType} cilt tipi ve ${data.complaint} ana sikayeti dikkate alinmistir.`, content.x + 14, y - 20, 90, 9, 13);
+  textLine(`Yas: ${data.age || "-"} - Durum: ${data.status}`, content.x + 14, y - 58, 9, "F1");
+  y -= summaryHeight + 26;
 
   sectionTitle("Skor Kartlari");
-  const scoreEntries = [["Genel cilt skoru", data.overallScore], ...Object.entries(data.scores)];
-  scoreEntries.forEach(([label, value], index) => {
+  const scores = [["Genel cilt skoru", data.overallScore], ...Object.entries(data.scores || {})];
+  scores.forEach(([label, value], index) => {
     const column = index % 3;
     const row = Math.floor(index / 3);
-    const x = content.x + column * 163;
-    const boxY = y - row * 48 - 34;
-    statCard(x, boxY, 150, label, `${value}/100`);
+    const x = content.x + column * 169;
+    const boxY = y - 58 - row * 72;
+    scoreCard(x, boxY, 154, label, value);
   });
-  y -= Math.ceil(scoreEntries.length / 3) * 48 + 42;
+  y -= Math.ceil(scores.length / 3) * 72 + 26;
 
-  const aiLines = wrapPdfText(data.aiComment, 82);
-  const aiHeight = 28 + aiLines.length * 13;
-  ensureSpace(aiHeight + 72);
+  ensureSpace(150);
   sectionTitle("AI Yorum");
-  cardBox(content.x, y - aiHeight, content.width, aiHeight, [0.985, 0.99, 0.985]);
-  wrappedParagraph(data.aiComment, content.x + 14, y - 22, 82, 9, 13);
-  y -= aiHeight + 22;
+  const aiLines = wrapPdfText(data.aiComment, 88);
+  const aiHeight = Math.max(76, 28 + aiLines.length * 13);
+  box(content.x, y - aiHeight, content.width, aiHeight, paper);
+  paragraph(data.aiComment, content.x + 14, y - 20, 88, 9, 13);
+  y -= aiHeight + 26;
 
-  const protocolLines = [
-    "HydraCare Leke ve Nem Dengeleme Protokolu",
-    "Seans sayisi: 6 - Siklik: Haftada 1",
-    data.salonNote || "Ilk 3 seansta bariyer destegi ve nem takibi onerilir.",
-  ];
-  const protocolWrapped = protocolLines.flatMap((line) => wrapPdfText(line, 82));
-  const protocolHeight = 26 + protocolWrapped.length * 13;
-  ensureSpace(protocolHeight + 72);
+  const protocolName = protocol.name || "Protokol onerisi";
+  const protocolSessions = protocol.sessions || protocol.sessionCount || "-";
+  const protocolFrequency = protocol.frequency || "-";
+  const protocolNote = protocol.salonNote || "Cilt skorlari ve uzman degerlendirmesi dogrultusunda, onerilen kabin protokolu salon uzmaniniz tarafindan kisiye ozel olarak guncellenebilir.";
+  const protocolText = `${protocolName}. Seans sayisi: ${protocolSessions}. Siklik: ${protocolFrequency}. ${protocolNote}`;
+  const protocolLines = wrapPdfText(protocolText, 88);
+  const protocolHeight = Math.max(86, 30 + protocolLines.length * 13);
+  ensureSpace(protocolHeight + 46);
   sectionTitle("Onerilen Kabin Protokolu");
-  cardBox(content.x, y - protocolHeight, content.width, protocolHeight, greenPanel);
-  let protocolY = y - 20;
-  protocolWrapped.forEach((line, index) => {
-    text(line, content.x + 14, protocolY, index === 0 ? 10 : 9, index === 0 ? "F2" : "F1");
-    protocolY -= 13;
-  });
-  y -= protocolHeight + 22;
+  box(content.x, y - protocolHeight, content.width, protocolHeight, greenPanel);
+  paragraph(protocolText, content.x + 14, y - 22, 88, 9, 13, "F2");
+  y -= protocolHeight + 26;
 
-  ensureSpace(210);
+  ensureSpace(140);
   sectionTitle("Onerilen Ev Devam Urunleri");
-  text("Bu urunler salonunuz tarafindan musteriye ev devam bakimi olarak onerilebilir.", content.x, y, 9, "F1");
+  textLine("Bu urunler salonunuz tarafindan musteriye ev devam bakimi olarak onerilebilir.", content.x, y, 9, "F1");
   y -= 18;
-  const products = [
-    "HydraCare Gentle Cleanser - Sabah / Aksam - Hassasiyet",
-    "HydraCare Barrier Serum - Aksam - Bariyer onarimi",
-    "HydraCare SPF 50 - Sabah - SPF korumasi",
-    "HydraCare Night Repair Cream - Aksam - Nem destegi",
-  ];
-  products.forEach((product) => {
-    const productLines = wrapPdfText(product, 82);
-    const productHeight = 18 + productLines.length * 12;
-    ensureSpace(productHeight + 18);
-    cardBox(content.x, y - productHeight, content.width, productHeight, greenPanel);
-    productLines.forEach((line, index) => {
-      text(line, content.x + 14, y - 15 - index * 12, 9, index === 0 ? "F2" : "F1");
-    });
-    y -= productHeight + 7;
+  const productRows = products.length
+    ? products
+    : [{ name: "Urun onerisi bulunmuyor", time: "", purpose: "", salesNote: "" }];
+  productRows.forEach((product) => {
+    const details = [product.time, product.purpose].filter(Boolean).join(" - ");
+    const salesNote = product.salesNote ? ` ${product.salesNote}` : "";
+    const productText = `${product.name || "Urun"}${details ? ` - ${details}` : ""}${salesNote}`;
+    const productLines = wrapPdfText(productText, 86);
+    const productHeight = Math.max(42, 18 + productLines.length * 12);
+    ensureSpace(productHeight + 14);
+    box(content.x, y - productHeight, content.width, productHeight, paper);
+    productLines.forEach((line, index) => textLine(line, content.x + 14, y - 16 - index * 12, 9, index === 0 ? "F2" : "F1"));
+    y -= productHeight + 9;
   });
 
-  const footerY = Math.max(58, y - 8);
-  lines.push(pdfLine(content.x, footerY + 18, content.x + content.width, footerY + 18, [0.89, 0.93, 0.91], 1));
-  text("Salon iletisim", content.x, footerY, 9, "F2");
-  text(`WhatsApp: ${salonPhone || "-"} - ${report.salon?.email || ""}`, content.x + 95, footerY, 9, "F1");
-  text("Bu rapor salon uzmani degerlendirmesiyle birlikte yorumlanmalidir.", content.x, footerY - 14, 8, "F1");
+  ensureSpace(96);
+  sectionTitle("Salon Iletisim");
+  box(content.x, y - 72, content.width, 72, greenPanel);
+  textLine(`WhatsApp: ${salonWhatsapp} - ${salonEmail || "-"}`, content.x + 14, y - 20, 9, "F2");
+  paragraph(salonAddress || "Adres bilgisi bulunmuyor", content.x + 14, y - 38, 90, 8, 11);
+  paragraph(footerNote, content.x + 14, y - 55, 90, 8, 11);
 
   const pdfPassword = getReportPdfPassword(report);
   return createSimplePdf(pages, { password: pdfPassword });
 }
-
 function safeFileName(value) {
   return normalizePdfText(value)
     .toLowerCase()
@@ -3267,6 +3268,7 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
+
 
 
 
