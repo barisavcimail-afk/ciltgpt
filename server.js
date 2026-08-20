@@ -672,7 +672,14 @@ function createPdfEncryption(password) {
 
 function createSimplePdf(linesOrPages, options = {}) {
   const pages = Array.isArray(linesOrPages[0]) ? linesOrPages : [linesOrPages];
+  const imagesByPage = Array.isArray(options.imagesByPage) ? options.imagesByPage : [];
   const pageObjectIds = pages.map((_, index) => 5 + index * 2);
+  const imageObjectStartId = 5 + pages.length * 2;
+  let imageCounter = 0;
+  const pageImageRefs = pages.map((_, pageIndex) => {
+    const pageImages = Array.isArray(imagesByPage[pageIndex]) ? imagesByPage[pageIndex] : [];
+    return pageImages.map((image) => ({ ...image, objectId: imageObjectStartId + imageCounter++ }));
+  });
   const encryption = createPdfEncryption(options.password);
   const objects = [
     { body: "<< /Type /Catalog /Pages 2 0 R >>" },
@@ -685,10 +692,20 @@ function createSimplePdf(linesOrPages, options = {}) {
     const pageObjectId = pageObjectIds[index];
     const contentObjectId = pageObjectId + 1;
     const content = Buffer.from(pageLines.join("\n"), "utf8");
+    const imageResources = pageImageRefs[index].length
+      ? ` /XObject << ${pageImageRefs[index].map((image) => `/${image.name} ${image.objectId} 0 R`).join(" ")} >>`
+      : "";
     objects.push(
-      { body: `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObjectId} 0 R >>` },
+      { body: `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>${imageResources} >> /Contents ${contentObjectId} 0 R >>` },
       { stream: content },
     );
+  });
+
+  pageImageRefs.flat().forEach((image) => {
+    objects.push({
+      dictionary: `<< /Type /XObject /Subtype /Image /Width ${image.width} /Height ${image.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length __LENGTH__ >>`,
+      stream: image.data,
+    });
   });
 
   if (encryption) objects.push({ body: encryption.dictionary });
@@ -706,7 +723,10 @@ function createSimplePdf(linesOrPages, options = {}) {
 
     if (object.stream) {
       const stream = encryption ? encryption.encryptStream(objectNumber, object.stream) : object.stream;
-      const streamHeader = Buffer.from(`<< /Length ${stream.length} >>\nstream\n`, "latin1");
+      const dictionary = object.dictionary
+        ? object.dictionary.replace("__LENGTH__", String(stream.length))
+        : `<< /Length ${stream.length} >>`;
+      const streamHeader = Buffer.from(`${dictionary}\nstream\n`, "latin1");
       const streamFooter = Buffer.from("\nendstream", "latin1");
       chunks.push(streamHeader, stream, streamFooter);
       byteLength += streamHeader.length + stream.length + streamFooter.length;
@@ -733,6 +753,59 @@ function createSimplePdf(linesOrPages, options = {}) {
 
   return Buffer.concat([...chunks, ...xrefChunks]);
 }
+function parseJpegSize(buffer) {
+  if (!Buffer.isBuffer(buffer) || buffer.length < 4 || buffer[0] !== 0xff || buffer[1] !== 0xd8) return null;
+  let offset = 2;
+  const sizeMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
+
+  while (offset + 9 < buffer.length) {
+    if (buffer[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = buffer[offset + 1];
+    offset += 2;
+    if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+    if (offset + 2 > buffer.length) return null;
+    const length = buffer.readUInt16BE(offset);
+    if (length < 2 || offset + length > buffer.length) return null;
+    if (sizeMarkers.has(marker)) {
+      return {
+        height: buffer.readUInt16BE(offset + 3),
+        width: buffer.readUInt16BE(offset + 5),
+      };
+    }
+    offset += length;
+  }
+
+  return null;
+}
+
+function pdfImageFromDataUrl(dataUrl) {
+  if (typeof dataUrl !== "string") return null;
+  const match = dataUrl.match(/^data:image\/(?:jpeg|jpg);base64,([A-Za-z0-9+/=\r\n]+)$/i);
+  if (!match) return null;
+  const data = Buffer.from(match[1].replace(/\s/g, ""), "base64");
+  const size = parseJpegSize(data);
+  if (!size || !size.width || !size.height) return null;
+  return { data, width: size.width, height: size.height };
+}
+
+function pdfPhotoEntries(photos) {
+  const labels = {
+    front: "On yuz",
+    left: "Sol profil",
+    right: "Sag profil",
+    close: "Yakin plan",
+  };
+
+  return Object.entries(labels)
+    .map(([key, label]) => {
+      const image = pdfImageFromDataUrl(photos?.[key]);
+      return image ? { label, image } : null;
+    })
+    .filter(Boolean);
+}
 function createReportPdf(report) {
   const data = databaseReportResponse(report);
   const date = new Date(data.analysisDate).toLocaleDateString("tr-TR", {
@@ -752,6 +825,7 @@ function createReportPdf(report) {
   const products = Array.isArray(data.recommendedProducts) ? data.recommendedProducts : [];
   const customerName = String(data.customerName || "-").toLocaleLowerCase("tr-TR");
   const pages = [];
+  const pageImages = [];
   let lines = [];
   const page = { width: 595, height: 842 };
   const content = { x: 42, width: 511 };
@@ -774,6 +848,7 @@ function createReportPdf(report) {
   const startPage = () => {
     lines = [];
     pages.push(lines);
+    pageImages.push([]);
     lines.push(pdfFillRect(0, 0, page.width, page.height, background));
     lines.push(pdfFillRect(30, 24, 535, 794, paper));
     lines.push(pdfStrokeRect(30, 24, 535, 794, [0.88, 0.93, 0.9], 1));
@@ -804,6 +879,24 @@ function createReportPdf(report) {
     textLine(`${score}/100`, x + 13, boxY + 24, 15, "F2");
     lines.push(pdfFillRoundedRect(x + 13, boxY + 12, width - 26, 7, 3, [0.91, 0.94, 0.92]));
     lines.push(pdfFillRoundedRect(x + 13, boxY + 12, Math.max(8, (width - 26) * (score / 100)), 7, 3, green));
+  };
+  const currentPageImages = () => pageImages[pageImages.length - 1] || [];
+  const drawPhotoCard = (label, image, x, boxY, width, height) => {
+    roundedBox(x, boxY, width, height, 11, paper);
+    textLine(label, x + 13, boxY + height - 22, 10, "F2");
+    const areaX = x + 12;
+    const areaY = boxY + 14;
+    const areaWidth = width - 24;
+    const areaHeight = height - 48;
+    lines.push(pdfFillRoundedRect(areaX, areaY, areaWidth, areaHeight, 8, [0.96, 0.98, 0.97]));
+    const scale = Math.min(areaWidth / image.width, areaHeight / image.height);
+    const drawWidth = image.width * scale;
+    const drawHeight = image.height * scale;
+    const drawX = areaX + (areaWidth - drawWidth) / 2;
+    const drawY = areaY + (areaHeight - drawHeight) / 2;
+    const imageName = `Im${currentPageImages().length + 1}`;
+    currentPageImages().push({ ...image, name: imageName });
+    lines.push(`q ${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${drawX.toFixed(2)} ${drawY.toFixed(2)} cm /${imageName} Do Q`);
   };
 
   startPage();
@@ -881,6 +974,24 @@ function createReportPdf(report) {
     y -= productHeight + 10;
   });
 
+
+  const photoRows = pdfPhotoEntries(data.analysisPhotos);
+  if (photoRows.length) {
+    const photoCardWidth = 238;
+    const photoCardHeight = 168;
+    ensureSpace(photoCardHeight + 64);
+    sectionTitle("Analiz Fotograflari");
+    photoRows.forEach((photo, index) => {
+      if (index % 2 === 0 && y - photoCardHeight < 66) {
+        startPage();
+        sectionTitle("Analiz Fotograflari");
+      }
+      const column = index % 2;
+      const x = content.x + column * (photoCardWidth + 35);
+      drawPhotoCard(photo.label, photo.image, x, y - photoCardHeight, photoCardWidth, photoCardHeight);
+      if (column === 1 || index === photoRows.length - 1) y -= photoCardHeight + 18;
+    });
+  }
   ensureSpace(110);
   sectionTitle("Salon Iletisim");
   roundedBox(content.x, y - 82, content.width, 82, 10, greenSoft);
@@ -889,7 +1000,7 @@ function createReportPdf(report) {
   paragraph(footerNote, content.x + 16, y - 62, 82, 9, 12);
 
   const pdfPassword = getReportPdfPassword(report);
-  return createSimplePdf(pages, { password: pdfPassword });
+  return createSimplePdf(pages, { password: pdfPassword, imagesByPage: pageImages });
 }
 function safeFileName(value) {
   return normalizePdfText(value)
@@ -3318,10 +3429,4 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
-
-
-
-
-
-
 
