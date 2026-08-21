@@ -3395,7 +3395,7 @@ export async function handleRequest(req, res) {
       return;
     }
 
-    const filePath = assetPathname === "/" ? join(root, "index.html") : safePath(assetPathname.slice(1));
+    const filePath = assetPathname === "/" ? join(root, "landing.html") : safePath(assetPathname.slice(1));
     const ext = extname(filePath);
     const file = await readFile(filePath);
     res.writeHead(200, {
@@ -3429,4 +3429,5 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
+
 
