@@ -570,44 +570,85 @@
   function authPage(mode = "salon") {
     const isAdmin = mode === "admin";
     const isFirm = mode === "firm";
-    const title = isAdmin ? "CiltGPT Admin" : isFirm ? "CiltGPT Firma" : "CiltGPT";
-    const subtitle = isAdmin ? "Platform yönetimi" : isFirm ? "Ürün tedarikçi paneli" : "Salon paneli";
-    const heading = isAdmin ? "Admin paneline giriş yap" : isFirm ? "Firma paneline giriş yap" : "Salon paneline giriş yap";
+    const subtitle = isAdmin ? "Platform yönetimi" : isFirm ? "Tedarikçi paneli" : "Salon paneli";
+    const heading = isAdmin ? "Admin paneline giriş" : isFirm ? "Firma paneline giriş" : "Salon paneline giriş";
     const eyebrow = isAdmin ? "Admin girişi" : isFirm ? "Firma girişi" : "Salon girişi";
     const formId = isAdmin ? "admin-login-form" : isFirm ? "firm-login-form" : "salon-login-form";
+    const placeholder = isAdmin ? "admin@ciltgpt.com" : isFirm ? "firm@hedracare.com" : "ayse@bellabeauty.com";
+    const primaryCopy = isAdmin
+      ? "Salonları, firmaları, paketleri ve platform kullanımını tek ekrandan yönetin."
+      : isFirm
+        ? "Ürünlerinizi global kütüphaneye ekleyin, salonlarınızı ve promosyon kodlarınızı takip edin."
+        : "Müşterilerinizi seçin, 4 fotoğrafla analiz oluşturun ve profesyonel öneri akışını başlatın.";
+    const metrics = isAdmin
+      ? [{ label: "Salon", value: "12+" }, { label: "Rapor", value: "152" }, { label: "Kontrol", value: "Canlı" }]
+      : isFirm
+        ? [{ label: "Ürün", value: "Toplu" }, { label: "Kod", value: "Tek kullanımlık" }, { label: "Salon", value: "Takip" }]
+        : [{ label: "Analiz", value: "4 fotoğraf" }, { label: "Öneri", value: "Ürün + protokol" }, { label: "Rapor", value: "PDF" }];
+    const formTitle = isAdmin ? "Yönetim hesabı" : isFirm ? "Firma hesabı" : "Salon hesabı";
+    const submitText = isAdmin ? "Admin girişi yap" : isFirm ? "Firma girişi yap" : "Giriş yap";
     return `
-      <main class="auth-screen">
-        <section class="auth-card">
-          <div class="brand auth-brand logo-brand">
-            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
-            <small class="brand-subtitle">${subtitle}</small>
-          </div>
-          <div>
-            <p class="eyebrow">${eyebrow}</p>
-            <h1>${heading}</h1>
-          </div>
-          <div id="auth-message" class="success-message error-message" hidden></div>
-          <form class="customer-form auth-form" id="${formId}">
-            <label><span>Kullanıcı adı / E-posta</span><input name="email" type="text" placeholder="${isAdmin ? "admin@ciltgpt.com" : isFirm ? "firm@hedracare.com" : "ayse@bellabeauty.com"}" required /></label>
-            <label>
-              <span>Şifre</span>
-              <div class="password-field">
-                <input name="password" type="password" placeholder="Şifre" required />
-                <button class="password-toggle" type="button" data-toggle-password aria-label="Şifreyi göster" aria-pressed="false">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
+      <main class="auth-screen auth-screen-${mode}">
+        <section class="auth-shell">
+          <aside class="auth-showcase" aria-label="CiltGPT tanıtım alanı">
+            <a class="brand auth-showcase-brand logo-brand" href="/" data-path="/">
+              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+              <small class="brand-subtitle">${subtitle}</small>
+            </a>
+            <div class="auth-copy">
+              <p class="auth-pill"><span></span>${eyebrow}</p>
+              <h1>Analiz eder, önerir, sattırır.</h1>
+              <p>${primaryCopy}</p>
+            </div>
+            <div class="auth-visual-card">
+              <div class="auth-visual-top">
+                <strong>Profesyonel analiz</strong>
+                <span>Canlı</span>
               </div>
-            </label>
-            <button class="button large" type="submit">${isAdmin ? "Admin girişi yap" : isFirm ? "Firma girişi yap" : "Giriş yap"}</button>
-          </form>
+              <div class="auth-photo-grid">
+                <article><span>Ön Yüz</span><small>Frontal</small></article>
+                <article><span>Sol Profil</span><small>Sol 45°</small></article>
+                <article><span>Sağ Profil</span><small>Sağ 45°</small></article>
+                <article><span>Yakın Plan</span><small>Makro detay</small></article>
+              </div>
+            </div>
+            <div class="auth-metrics">
+              ${metrics.map((metric) => `<article><strong>${metric.value}</strong><span>${metric.label}</span></article>`).join("")}
+            </div>
+          </aside>
+
+          <section class="auth-card">
+            <div class="brand auth-brand logo-brand">
+              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+              <small class="brand-subtitle">${subtitle}</small>
+            </div>
+            <div class="auth-card-heading">
+              <p class="eyebrow">${eyebrow}</p>
+              <h2>${heading}</h2>
+              <p>${formTitle} bilgilerinizi girerek devam edin.</p>
+            </div>
+            <div id="auth-message" class="success-message error-message" hidden></div>
+            <form class="customer-form auth-form" id="${formId}">
+              <label><span>Kullanıcı adı / E-posta</span><input name="email" type="text" placeholder="${placeholder}" autocomplete="username" required /></label>
+              <label>
+                <span>Şifre</span>
+                <div class="password-field">
+                  <input name="password" type="password" placeholder="Şifre" autocomplete="current-password" required />
+                  <button class="password-toggle" type="button" data-toggle-password aria-label="Şifreyi göster" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </label>
+              <button class="button large auth-submit" type="submit">${submitText}</button>
+            </form>
+          </section>
         </section>
       </main>
     `;
   }
-
   function productEditForm(formId) {
     return `
       <form id="${formId}" class="modal-form">
@@ -986,5 +1027,6 @@
     placeholderPage,
   };
 })();
+
 
 
