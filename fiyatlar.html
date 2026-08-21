@@ -6,16 +6,15 @@
   <title>CİLTGPT</title>
   <style>
     :root {
-      --bg: #f3f8f5;
-      --panel: #ffffff;
-      --panel-soft: #f8fbf9;
-      --text: #12201a;
-      --muted: #64736b;
-      --line: #dce9e0;
-      --green: #229f67;
-      --green-dark: #087144;
-      --green-soft: #e5f6ee;
-      --shadow: 0 24px 70px rgba(18, 52, 34, 0.10);
+      --ink: #0f172a;
+      --muted: #667085;
+      --soft: #f8fafc;
+      --line: #e5e7eb;
+      --purple: #8b5cf6;
+      --purple-dark: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --green: #10b981;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
     }
 
     * { box-sizing: border-box; }
@@ -23,185 +22,275 @@
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 50% -10%, rgba(34,159,103,.16), transparent 36rem),
-        linear-gradient(180deg, #ffffff 0%, var(--bg) 56%, #eef6f1 100%);
+      color: var(--ink);
+      background: #ffffff;
       line-height: 1.5;
     }
     a { color: inherit; text-decoration: none; }
 
-    .wrap { width: min(1240px, calc(100% - 32px)); margin: 0 auto; }
-    .topbar { padding: 24px 0 8px; }
-    .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: -0.02em; }
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      color: white;
-      background: var(--green);
-      box-shadow: 0 10px 28px rgba(34, 159, 103, 0.22);
+    .wrap { width: min(1200px, calc(100% - 40px)); margin: 0 auto; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom: 1px solid #f1f5f9;
+      backdrop-filter: blur(18px);
     }
-    .status { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(34,159,103,.12); }
-
-    .hero { padding: 46px 0 42px; text-align: center; }
-    .pill {
+    .nav {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: -0.025em; font-size: 19px; }
+    .brand-mark { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #fff; background: var(--ink); font-size: 14px; font-weight: 900; }
+    .nav-left { display: flex; align-items: center; gap: 34px; min-width: 0; }
+    .nav-links { display: flex; align-items: center; gap: 28px; color: #525866; font-size: 13.5px; font-weight: 650; white-space: nowrap; }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+    .login-link { color: #525866; font-size: 13.5px; font-weight: 650; padding: 9px 10px; }
+    .login-link:hover { color: var(--ink); }
+    .btn {
+      min-height: 44px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 9px;
       border-radius: 999px;
-      padding: 9px 15px;
-      background: var(--green-soft);
-      border: 1px solid rgba(34,159,103,.18);
-      color: var(--green-dark);
-      font-size: 13px;
+      padding: 0 23px;
+      border: 1px solid transparent;
+      font-size: 14px;
       font-weight: 850;
+      transition: 160ms ease;
+      cursor: pointer;
     }
+    .btn-purple { background: var(--purple); color: white; box-shadow: 0 10px 24px rgba(139, 92, 246, 0.26); }
+    .btn-purple:hover { background: var(--purple-dark); transform: translateY(-1px); }
+    .btn-dark { background: var(--ink); color: white; }
+    .btn-dark:hover { background: #050914; transform: translateY(-1px); }
+    .btn-soft { background: #fff; color: var(--ink); border-color: var(--line); }
+    .btn-soft:hover { border-color: #cbd5e1; background: var(--soft); }
+
+    .hero {
+      min-height: 620px;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 62px;
+      align-items: center;
+      padding: 72px 0 46px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #475467;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--green); }
     h1 {
-      margin: 24px auto 0;
-      max-width: 980px;
-      font-size: clamp(48px, 8.4vw, 104px);
-      line-height: .92;
+      margin: 24px 0 0;
+      max-width: 620px;
+      font-size: clamp(46px, 5.5vw, 72px);
+      line-height: .95;
       letter-spacing: -0.055em;
       font-weight: 950;
     }
-    h1 span { display: block; }
-    .hero-subtitle { margin-top: 26px; font-size: clamp(21px, 3vw, 30px); font-weight: 900; letter-spacing: -0.03em; }
-    .hero-subtitle strong { color: var(--green-dark); }
-    .hero-note { margin-top: 10px; color: var(--muted); font-size: 16px; font-weight: 700; }
+    h1 .accent { color: var(--purple); display: block; }
+    .hero-copy { margin-top: 22px; display: grid; gap: 10px; }
+    .hero-copy strong { font-size: 20px; letter-spacing: -0.025em; }
+    .hero-copy span { color: var(--ink); font-size: 18px; font-weight: 700; }
+    .device-row { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .device { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; color: #697386; background: #fff; font-size: 12.5px; }
+    .place-note { margin-top: 12px; color: #98a2b3; font-size: 12.5px; }
+    .hero-buttons { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 13px; }
+    .tiny-note { margin-top: 18px; color: #98a2b3; font-size: 12px; }
 
-    .photo-grid { width: min(760px, 100%); margin: 42px auto 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .analysis-card {
+      border-radius: 30px;
+      background: var(--soft);
+      border: 1px solid #eef2f7;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .analysis-top { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 18px; color: #667085; font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .02em; }
+    .live { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 11px; background: #ecfdf5; border: 1px solid #bbf7d0; color: #059669; font-size: 11px; font-weight: 800; text-transform: none; letter-spacing: 0; }
+    .live::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+    .photo-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
     .photo-card {
-      position: relative;
-      min-height: 164px;
-      border-radius: 20px;
-      border: 1px dashed rgba(34,159,103,.35);
-      background: rgba(255,255,255,.78);
+      min-height: 174px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 10px;
+    }
+    .photo-inner {
+      height: 100%;
+      border-radius: 14px;
+      border: 1px dashed #d7dce5;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 18px 12px;
-      box-shadow: 0 14px 38px rgba(18,52,34,.06);
+      text-align: center;
+      background: #fcfcff;
     }
-    .photo-icon { width: 50px; height: 50px; border-radius: 16px; display: grid; place-items: center; background: var(--panel-soft); border: 1px solid var(--line); color: var(--green-dark); font-weight: 950; margin-bottom: 13px; }
-    .photo-title { font-weight: 850; font-size: 14px; }
-    .photo-desc { margin-top: 4px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
-    .camera-note { margin-top: 18px; display: inline-flex; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .photo-icon { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: #fff; border: 1px solid #edf0f5; color: var(--ink); font-weight: 900; margin-bottom: 14px; }
+    .photo-title { font-size: 13px; font-weight: 850; }
+    .photo-desc { margin-top: 3px; color: #98a2b3; font-size: 11.5px; }
+    .process { margin-top: 16px; min-height: 58px; border-radius: 14px; background: #fff; border: 1px solid #edf0f5; display: flex; align-items: center; gap: 14px; padding: 12px 16px; }
+    .bolt { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--purple-soft); color: var(--purple); font-weight: 950; }
+    .process strong { display: block; font-size: 13px; }
+    .process span { display: block; margin-top: 2px; color: #667085; font-size: 11.5px; }
+    .process-time { margin-left: auto; color: #667085; font-size: 11.5px; white-space: nowrap; }
 
-    .pricing { padding: 16px 0 60px; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; max-width: 1100px; margin: 0 auto; }
+    .pricing-section { padding: 36px 0 78px; }
+    .section-title { text-align: center; margin-bottom: 38px; }
+    .section-title h2 { margin: 0; font-size: clamp(30px, 4vw, 46px); line-height: 1; letter-spacing: -0.045em; font-weight: 950; }
+    .section-title p { margin: 12px 0 0; color: #667085; font-size: 15px; font-weight: 650; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 22px; align-items: stretch; }
     .price-card {
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 560px;
+      min-height: 555px;
       border-radius: 28px;
+      background: #fff;
       border: 1px solid var(--line);
-      background: var(--panel);
-      padding: 28px;
-      box-shadow: var(--shadow);
+      padding: 30px;
+      box-shadow: 0 20px 55px rgba(15,23,42,.08);
     }
-    .price-card.featured { border-color: rgba(34,159,103,.56); box-shadow: 0 28px 78px rgba(34,159,103,.18); transform: translateY(-14px); }
-    .badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 999px; padding: 8px 14px; background: #eff8f3; color: var(--green-dark); border: 1px solid rgba(34,159,103,.2); font-size: 12px; font-weight: 950; }
-    .featured .badge { background: var(--green); color: white; box-shadow: 0 12px 28px rgba(34,159,103,.26); }
-    .elite .badge { background: #10251b; color: white; }
-
-    .price-line { margin-top: 22px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-    .price { color: var(--green-dark); font-size: clamp(36px, 4vw, 42px); line-height: 1; font-weight: 950; letter-spacing: -0.045em; }
-    .period { color: var(--muted); font-size: 16px; font-weight: 800; }
-    .yearly { margin-top: 14px; display: inline-flex; width: fit-content; max-width: 100%; border-radius: 999px; padding: 8px 12px; background: var(--green-soft); border: 1px solid rgba(34,159,103,.16); color: var(--green-dark); font-size: 11px; font-weight: 950; }
+    .price-card.featured { border-color: rgba(139,92,246,.45); box-shadow: 0 26px 76px rgba(139,92,246,.18); transform: translateY(-14px); }
+    .badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 999px; padding: 8px 15px; background: #111827; color: white; font-size: 11px; font-weight: 900; letter-spacing: .02em; }
+    .featured .badge { background: var(--purple); box-shadow: 0 10px 24px rgba(139,92,246,.30); }
+    .elite .badge { background: #fff; color: #111827; border: 1px solid var(--line); }
+    .price-line { margin-top: 28px; display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+    .price { font-size: clamp(36px, 4vw, 42px); line-height: 1; font-weight: 950; letter-spacing: -0.045em; color: var(--ink); }
+    .period { color: #667085; font-size: 16px; font-weight: 650; }
+    .yearly { margin-top: 14px; display: inline-flex; width: fit-content; max-width: 100%; border-radius: 999px; padding: 8px 12px; background: var(--purple-soft); border: 1px solid #ede9fe; color: var(--purple-dark); font-size: 11px; font-weight: 900; }
     .limits { margin-top: 24px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .limit-box { border-radius: 14px; border: 1px solid var(--line); background: var(--panel-soft); padding: 13px; }
-    .limit-label { color: var(--muted); font-size: 11px; font-weight: 850; }
-    .limit-value { margin-top: 5px; color: var(--text); font-size: 13px; font-weight: 850; }
-    .features { margin: 28px 0 30px; padding: 0; list-style: none; display: grid; gap: 14px; color: var(--muted); font-size: 13.5px; font-weight: 720; }
+    .limit-box { border-radius: 14px; border: 1px solid #edf0f5; background: #fbfcfd; padding: 13px; }
+    .limit-label { color: #98a2b3; font-size: 11px; font-weight: 750; }
+    .limit-value { margin-top: 5px; color: var(--ink); font-size: 13px; font-weight: 850; }
+    .features { margin: 28px 0 30px; padding: 0; list-style: none; display: grid; gap: 14px; color: #475467; font-size: 13.5px; font-weight: 650; }
     .features li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
-    .check { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); color: var(--green-dark); font-weight: 950; font-size: 13px; }
-    .btn {
-      margin-top: auto;
-      min-height: 50px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: var(--green-soft);
-      color: var(--green-dark);
-      border: 1px solid rgba(34,159,103,.16);
-      font-size: 14px;
-      font-weight: 950;
-      transition: 160ms ease;
-    }
-    .btn:hover { background: var(--green); color: white; }
-    .featured .btn { background: var(--green); color: white; box-shadow: 0 14px 30px rgba(34,159,103,.22); }
-    .featured .btn:hover { background: var(--green-dark); }
-    .trust { margin-top: 26px; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; color: var(--muted); font-size: 12px; font-weight: 750; }
-    .trust span { display: inline-flex; align-items: center; gap: 8px; }
-    .trust span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--green); opacity: .75; }
+    .check { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--purple-soft); color: var(--purple); font-weight: 950; font-size: 13px; }
+    .price-card .btn { width: 100%; margin-top: auto; }
+    .featured .price-card .btn { background: var(--purple); }
+    .trust { margin-top: 28px; display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; color: #667085; font-size: 12px; font-weight: 650; }
+    .trust span { display: inline-flex; align-items: center; gap: 9px; }
+    .trust span::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #525866; }
 
-    .gain { padding: 0 0 34px; }
-    .section-title { text-align: center; margin-bottom: 28px; }
-    .section-title h2 { margin: 0; font-size: clamp(28px, 3.4vw, 38px); font-weight: 950; letter-spacing: -0.04em; }
-    .gain-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; max-width: 1060px; margin: 0 auto; }
-    .gain-card { border-radius: 22px; border: 1px solid var(--line); background: rgba(255,255,255,.84); padding: 24px; box-shadow: 0 16px 44px rgba(18,52,34,.06); }
+    .gain { padding: 10px 0 72px; }
+    .gain-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 18px; }
+    .gain-card { border-radius: 20px; background: #fff; border: 1px solid var(--line); padding: 28px; box-shadow: 0 18px 45px rgba(15,23,42,.06); }
     .gain-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-    .gain-icon { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: #10251b; color: white; font-weight: 950; }
-    .gain-no { color: #b7c8bd; font-size: 12px; font-weight: 950; letter-spacing: .12em; }
-    .gain-card h3 { margin: 0; font-size: 16px; font-weight: 900; }
-    .gain-card p { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; font-weight: 650; }
+    .gain-icon { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 900; }
+    .gain-no { color: #d1d5db; font-size: 12px; font-weight: 900; letter-spacing: .14em; }
+    .gain-card h3 { margin: 0; font-size: 16px; font-weight: 850; }
+    .gain-card p { margin: 8px 0 0; color: #667085; font-size: 13.5px; font-weight: 600; }
 
-    footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted); font-size: 12px; font-weight: 700; }
+    footer { border-top: 1px solid #f1f5f9; padding: 30px 0; color: #98a2b3; font-size: 12px; font-weight: 650; }
     .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-    .footer-status { display: inline-flex; align-items: center; gap: 8px; }
+    .footer-status { display: inline-flex; align-items: center; gap: 8px; color: #667085; }
+    .footer-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
 
     @media (max-width: 980px) {
-      .pricing-grid { grid-template-columns: 1fr; max-width: 620px; }
+      .hero { grid-template-columns: 1fr; gap: 34px; min-height: auto; }
+      .analysis-card { max-width: 620px; width: 100%; margin: 0 auto; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 620px; margin: 0 auto; }
       .price-card.featured { transform: none; }
-      .gain-grid { grid-template-columns: 1fr; max-width: 620px; }
+      .gain-grid { grid-template-columns: 1fr; max-width: 620px; margin: 0 auto; }
     }
-    @media (max-width: 720px) {
-      .wrap { width: min(100% - 24px, 1240px); }
-      .brand-row { align-items: flex-start; flex-direction: column; }
-      .hero { padding-top: 30px; }
-      .photo-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 24px, 1200px); }
+      .nav { height: auto; padding: 14px 0; align-items: flex-start; flex-direction: column; }
+      .nav-left { width: 100%; align-items: flex-start; flex-direction: column; gap: 14px; }
+      .nav-links { width: 100%; gap: 10px; flex-wrap: wrap; }
+      .nav-links a { padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: #fff; }
+      .nav-actions { width: 100%; }
+      .nav-actions .btn, .nav-actions .login-link { flex: 1 1 auto; }
+      .hero { padding: 34px 0 36px; }
+      h1 { font-size: clamp(42px, 13vw, 64px); }
+      .hero-buttons { flex-direction: column; }
+      .hero-buttons .btn { width: 100%; }
+      .photo-grid { grid-template-columns: 1fr; }
       .limits { grid-template-columns: 1fr; }
-      .price-card { min-height: auto; padding: 24px; }
-      .trust { align-items: flex-start; flex-direction: column; gap: 10px; }
       .footer-row { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <header class="topbar">
-      <div class="wrap brand-row">
-        <a class="brand" href="/" aria-label="ciltGPT">
+  <header class="topbar">
+    <div class="wrap nav">
+      <div class="nav-left">
+        <a class="brand" href="/" aria-label="CiltGPT Ana Sayfa">
           <span class="brand-mark">c</span>
-          <span>ciltGPT</span>
+          <span>CiltGPT</span>
         </a>
-        <div class="status"><span class="dot"></span>Tüm salonlar için aktif</div>
+        <nav class="nav-links" aria-label="Ana menü">
+          <a href="/#nasil-calisir">Nasıl Çalışır?</a>
+          <a href="/#ornek-rapor">Örnek Rapor</a>
+          <a href="/fiyatlar">Fiyatlar</a>
+        </nav>
       </div>
-    </header>
+      <div class="nav-actions">
+        <a class="login-link" href="/login" target="_blank" rel="noopener noreferrer">Giriş Yap</a>
+        <a class="btn btn-purple" href="/login" target="_blank" rel="noopener noreferrer">Hemen Başla</a>
+      </div>
+    </div>
+  </header>
 
+  <main>
     <section class="wrap hero">
-      <div class="pill">Günde 49 TL'ye Salonun İçin En İyi Ürün Satış Uzmanı</div>
-      <h1><span>Analiz Eder,</span><span>Önerir,</span><span>Sattırır</span></h1>
-      <div class="hero-subtitle">Cilt Analizinde <strong>Yapay Zeka Dönemi</strong> Başladı</div>
-      <div class="hero-note">4 fotoğrafla profesyonel analiz sistemi</div>
-      <div class="photo-grid" aria-label="Fotoğraf adımları">
-        <div class="photo-card"><div class="photo-icon">1</div><div class="photo-title">Ön Yüz</div><div class="photo-desc">Frontal</div></div>
-        <div class="photo-card"><div class="photo-icon">2</div><div class="photo-title">Sol Profil</div><div class="photo-desc">Left 45°</div></div>
-        <div class="photo-card"><div class="photo-icon">3</div><div class="photo-title">Sağ Profil</div><div class="photo-desc">Right 45°</div></div>
-        <div class="photo-card"><div class="photo-icon">4</div><div class="photo-title">Yakın Plan</div><div class="photo-desc">Macro Detail</div></div>
+      <div>
+        <div class="eyebrow">Cihaza bağlı kalmadan</div>
+        <h1>Günde 49 TL'ye Salonun İçin En İyi <span class="accent">Satış Uzmanı</span></h1>
+        <div class="hero-copy">
+          <strong>Analiz Eder, Önerir, Sattırır</strong>
+          <span>Cilt Analizinde Yapay Zeka Dönemi Başladı</span>
+        </div>
+        <div class="device-row">
+          <span class="device">▯ Telefon</span>
+          <span class="device">▯ Tablet</span>
+          <span class="device">▱ Bilgisayar</span>
+        </div>
+        <div class="place-note">— İstediğin yerde, istediğin zaman satışa devam et.</div>
+        <div class="hero-buttons">
+          <a class="btn btn-dark" href="/#ornek-rapor">▤ Örnek Raporu İncele</a>
+          <a class="btn btn-purple" href="/login" target="_blank" rel="noopener noreferrer">Hemen Başla →</a>
+        </div>
+        <div class="tiny-note">Profesyonel analiz • Kurulum gerektirmez • 10 saniyede sonuç</div>
       </div>
-      <div class="camera-note">Telefon kamerası yeterli • Profesyonel kurulum gerektirmez</div>
+
+      <aside class="analysis-card" aria-label="Profesyonel analiz önizlemesi">
+        <div class="analysis-top"><span>Profesyonel Analiz</span><span class="live">Canlı</span></div>
+        <div class="photo-grid">
+          <div class="photo-card"><div class="photo-inner"><div class="photo-icon">⌾</div><div class="photo-title">Ön Yüz</div><div class="photo-desc">Frontal</div></div></div>
+          <div class="photo-card"><div class="photo-inner"><div class="photo-icon">◌</div><div class="photo-title">Sol Profil</div><div class="photo-desc">Sol 45°</div></div></div>
+          <div class="photo-card"><div class="photo-inner"><div class="photo-icon">◌</div><div class="photo-title">Sağ Profil</div><div class="photo-desc">Sağ 45°</div></div></div>
+          <div class="photo-card"><div class="photo-inner"><div class="photo-icon">◎</div><div class="photo-title">Yakın Plan</div><div class="photo-desc">Makro Detay</div></div></div>
+        </div>
+        <div class="process">
+          <div class="bolt">ϟ</div>
+          <div><strong>Yapay Zeka Analizi</strong><span>4 açı birleşiyor • Profesyonel öneri hazırlanıyor</span></div>
+          <div class="process-time">~10 sn</div>
+        </div>
+      </aside>
     </section>
 
-    <section class="wrap pricing">
+    <section id="fiyatlar" class="wrap pricing-section">
+      <div class="section-title">
+        <h2>Fiyatlar</h2>
+        <p>Yıllıkta 10 AY ÖDE 12 AY KULLAN +2 AY HEDİYE</p>
+      </div>
       <div class="pricing-grid">
         <article class="price-card">
           <div class="badge">Başlangıç</div>
@@ -219,7 +308,7 @@
             <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
             <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">Hemen Başla</a>
+          <a class="btn btn-soft" href="/login" target="_blank" rel="noopener noreferrer">Hemen Başla</a>
         </article>
 
         <article class="price-card featured">
@@ -238,7 +327,7 @@
             <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
             <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">En Çok Tercih Edilen</a>
+          <a class="btn btn-purple" href="/login" target="_blank" rel="noopener noreferrer">En Çok Tercih Edilen</a>
         </article>
 
         <article class="price-card elite">
@@ -257,7 +346,7 @@
             <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
             <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">Elite'e Geç</a>
+          <a class="btn btn-soft" href="/login" target="_blank" rel="noopener noreferrer">Elite'e Geç</a>
         </article>
       </div>
       <div class="trust">
@@ -270,30 +359,18 @@
     <section class="wrap gain">
       <div class="section-title"><h2>CiltGPT Salonuna Ne Kazandırır?</h2></div>
       <div class="gain-grid">
-        <article class="gain-card">
-          <div class="gain-top"><div class="gain-icon">01</div><div class="gain-no">01</div></div>
-          <h3>Derin Analiz</h3>
-          <p>4 açıdan derin analiz, leke derinliğini yakın planda tespit eder</p>
-        </article>
-        <article class="gain-card">
-          <div class="gain-top"><div class="gain-icon">02</div><div class="gain-no">02</div></div>
-          <h3>Kişiye Özel Satış</h3>
-          <p>Kişiye özel rapor + senin ürünlerin otomatik önerilir</p>
-        </article>
-        <article class="gain-card">
-          <div class="gain-top"><div class="gain-icon">03</div><div class="gain-no">03</div></div>
-          <h3>Sadakat & Satış</h3>
-          <p>WhatsApp rapor sadakat ve ev devam satışını artırır</p>
-        </article>
+        <article class="gain-card"><div class="gain-top"><div class="gain-icon">01</div><div class="gain-no">01</div></div><h3>Derin Analiz</h3><p>4 açıdan derin analiz, leke derinliğini yakın planda tespit eder</p></article>
+        <article class="gain-card"><div class="gain-top"><div class="gain-icon">02</div><div class="gain-no">02</div></div><h3>Kişiye Özel Satış</h3><p>Kişiye özel rapor + senin ürünlerin otomatik önerilir</p></article>
+        <article class="gain-card"><div class="gain-top"><div class="gain-icon">03</div><div class="gain-no">03</div></div><h3>Sadakat & Satış</h3><p>WhatsApp rapor sadakat ve ev devam satışını artırır</p></article>
       </div>
     </section>
-
-    <footer>
-      <div class="wrap footer-row">
-        <span>© 2026 ciltGPT — Salonlar için AI cilt analizi</span>
-        <span class="footer-status"><span class="dot"></span>Sistem aktif • Tüm özellikler dahil</span>
-      </div>
-    </footer>
   </main>
+
+  <footer>
+    <div class="wrap footer-row">
+      <span>© 2026 ciltGPT — Salonlar için AI cilt analizi</span>
+      <span class="footer-status">Sistem aktif • Tüm özellikler dahil</span>
+    </div>
+  </footer>
 </body>
 </html>
