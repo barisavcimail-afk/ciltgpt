@@ -6,18 +6,16 @@
   <title>CİLTGPT</title>
   <style>
     :root {
-      --bg: #f4f8f5;
+      --bg: #f3f8f5;
       --panel: #ffffff;
       --panel-soft: #f8fbf9;
       --text: #12201a;
       --muted: #64736b;
-      --line: #dbe8df;
+      --line: #dce9e0;
       --green: #229f67;
-      --green-dark: #0f7a4a;
-      --green-soft: #e6f6ee;
-      --amber: #9a6412;
-      --amber-soft: #fff6e8;
-      --shadow: 0 24px 70px rgba(25, 64, 43, 0.10);
+      --green-dark: #087144;
+      --green-soft: #e5f6ee;
+      --shadow: 0 24px 70px rgba(18, 52, 34, 0.10);
     }
 
     * { box-sizing: border-box; }
@@ -25,332 +23,277 @@
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
       color: var(--text);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(34,159,103,.16), transparent 36rem),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 56%, #eef6f1 100%);
       line-height: 1.5;
     }
-
     a { color: inherit; text-decoration: none; }
 
-    .page {
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top left, rgba(34, 159, 103, 0.12), transparent 34rem),
-        linear-gradient(180deg, #ffffff 0%, var(--bg) 42%, #eef6f1 100%);
-    }
-
-    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.86);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(16px);
-    }
-
-    .nav {
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
+    .wrap { width: min(1240px, calc(100% - 32px)); margin: 0 auto; }
+    .topbar { padding: 24px 0 8px; }
+    .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .brand { display: inline-flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: -0.02em; }
     .brand-mark {
-      width: 40px;
-      height: 40px;
-      border-radius: 14px;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
       color: white;
       background: var(--green);
-      box-shadow: 0 10px 26px rgba(34, 159, 103, 0.24);
+      box-shadow: 0 10px 28px rgba(34, 159, 103, 0.22);
     }
+    .status { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(34,159,103,.12); }
 
-    .nav-actions { display: flex; align-items: center; gap: 10px; }
-    .nav-link { color: var(--muted); font-weight: 700; font-size: 14px; padding: 10px 12px; border-radius: 999px; }
-    .nav-link:hover { color: var(--green-dark); background: var(--green-soft); }
-
-    .btn {
-      min-height: 44px;
+    .hero { padding: 46px 0 42px; text-align: center; }
+    .pill {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       border-radius: 999px;
-      padding: 0 20px;
-      border: 1px solid transparent;
-      font-weight: 800;
-      font-size: 14px;
-      transition: 160ms ease;
-      cursor: pointer;
+      padding: 9px 15px;
+      background: var(--green-soft);
+      border: 1px solid rgba(34,159,103,.18);
+      color: var(--green-dark);
+      font-size: 13px;
+      font-weight: 850;
     }
-    .btn-primary { color: white; background: var(--green); box-shadow: 0 12px 28px rgba(34, 159, 103, 0.22); }
-    .btn-primary:hover { background: var(--green-dark); }
-    .btn-soft { color: var(--green-dark); background: var(--green-soft); }
-    .btn-soft:hover { background: #d7efe3; }
-    .btn-dark { color: white; background: #10251b; }
-    .btn-dark:hover { background: #07130e; }
-
-    .hero {
-      padding: 64px 0 34px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 36px;
-      align-items: end;
+    h1 {
+      margin: 24px auto 0;
+      max-width: 980px;
+      font-size: clamp(48px, 8.4vw, 104px);
+      line-height: .92;
+      letter-spacing: -0.055em;
+      font-weight: 950;
     }
+    h1 span { display: block; }
+    .hero-subtitle { margin-top: 26px; font-size: clamp(21px, 3vw, 30px); font-weight: 900; letter-spacing: -0.03em; }
+    .hero-subtitle strong { color: var(--green-dark); }
+    .hero-note { margin-top: 10px; color: var(--muted); font-size: 16px; font-weight: 700; }
 
-    .eyebrow { color: var(--green-dark); font-size: 13px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
-    h1 { margin: 12px 0 0; max-width: 760px; font-size: clamp(42px, 7vw, 82px); line-height: 0.96; letter-spacing: -0.05em; }
-    .lead { margin: 22px 0 0; max-width: 680px; color: var(--muted); font-size: clamp(16px, 2.2vw, 20px); font-weight: 600; }
-
-    .hero-card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: var(--shadow);
+    .photo-grid { width: min(760px, 100%); margin: 42px auto 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .photo-card {
+      position: relative;
+      min-height: 164px;
+      border-radius: 20px;
+      border: 1px dashed rgba(34,159,103,.35);
+      background: rgba(255,255,255,.78);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 12px;
+      box-shadow: 0 14px 38px rgba(18,52,34,.06);
     }
-    .hero-price { font-size: 54px; line-height: 1; font-weight: 950; color: var(--green-dark); letter-spacing: -0.04em; }
-    .hero-price small { font-size: 18px; color: var(--muted); letter-spacing: 0; }
-    .hero-list { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; color: var(--muted); font-weight: 650; }
-    .hero-list li { display: flex; gap: 10px; align-items: flex-start; }
-    .check { width: 22px; height: 22px; border-radius: 999px; background: var(--green-soft); color: var(--green-dark); display: grid; place-items: center; flex: 0 0 auto; font-size: 14px; font-weight: 900; }
+    .photo-icon { width: 50px; height: 50px; border-radius: 16px; display: grid; place-items: center; background: var(--panel-soft); border: 1px solid var(--line); color: var(--green-dark); font-weight: 950; margin-bottom: 13px; }
+    .photo-title { font-weight: 850; font-size: 14px; }
+    .photo-desc { margin-top: 4px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+    .camera-note { margin-top: 18px; display: inline-flex; color: var(--muted); font-size: 12px; font-weight: 750; }
 
-    .section { padding: 36px 0; }
-    .section-head { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin-bottom: 18px; }
-    .section h2 { margin: 0; font-size: clamp(26px, 3vw, 36px); letter-spacing: -0.035em; }
-    .section-note { color: var(--muted); font-size: 14px; font-weight: 650; }
-
-    .pricing-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+    .pricing { padding: 16px 0 60px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; max-width: 1100px; margin: 0 auto; }
     .price-card {
       position: relative;
       display: flex;
       flex-direction: column;
-      min-height: 510px;
-      padding: 24px;
-      border-radius: 22px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: 0 16px 44px rgba(25, 64, 43, 0.07);
-    }
-    .price-card.featured { border-color: rgba(34, 159, 103, 0.55); box-shadow: 0 24px 72px rgba(34, 159, 103, 0.16); }
-    .badge { width: max-content; border-radius: 999px; background: var(--green-soft); color: var(--green-dark); padding: 7px 11px; font-size: 12px; font-weight: 900; }
-    .badge-amber { background: var(--amber-soft); color: var(--amber); }
-    .plan-title { margin: 18px 0 6px; font-size: 24px; font-weight: 950; letter-spacing: -0.03em; }
-    .plan-price { margin: 0; color: var(--green-dark); font-size: 38px; line-height: 1.1; font-weight: 950; letter-spacing: -0.04em; }
-    .plan-price span { color: var(--muted); font-size: 15px; letter-spacing: 0; font-weight: 800; }
-    .limits { margin: 18px 0 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .limit-box { border: 1px solid var(--line); background: var(--panel-soft); border-radius: 14px; padding: 12px; }
-    .limit-box small { display: block; color: var(--muted); font-size: 12px; font-weight: 800; }
-    .limit-box strong { display: block; margin-top: 3px; font-size: 15px; }
-    .features { margin: 20px 0 24px; padding: 0; list-style: none; display: grid; gap: 11px; color: var(--muted); font-size: 14px; font-weight: 650; }
-    .price-card .btn { margin-top: auto; width: 100%; }
-
-    .compare {
-      overflow: hidden;
-      border-radius: 22px;
+      min-height: 560px;
+      border-radius: 28px;
       border: 1px solid var(--line);
       background: var(--panel);
-      box-shadow: 0 16px 44px rgba(25, 64, 43, 0.06);
+      padding: 28px;
+      box-shadow: var(--shadow);
     }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 16px 18px; border-bottom: 1px solid var(--line); font-size: 14px; }
-    th { color: var(--muted); background: var(--panel-soft); font-weight: 900; }
-    tr:last-child td { border-bottom: 0; }
-    td strong { color: var(--green-dark); }
+    .price-card.featured { border-color: rgba(34,159,103,.56); box-shadow: 0 28px 78px rgba(34,159,103,.18); transform: translateY(-14px); }
+    .badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); white-space: nowrap; border-radius: 999px; padding: 8px 14px; background: #eff8f3; color: var(--green-dark); border: 1px solid rgba(34,159,103,.2); font-size: 12px; font-weight: 950; }
+    .featured .badge { background: var(--green); color: white; box-shadow: 0 12px 28px rgba(34,159,103,.26); }
+    .elite .badge { background: #10251b; color: white; }
 
-    .cta {
-      margin: 36px 0 64px;
-      border-radius: 26px;
-      background: #10251b;
-      color: white;
-      padding: 34px;
-      display: flex;
-      justify-content: space-between;
+    .price-line { margin-top: 22px; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+    .price { color: var(--green-dark); font-size: clamp(36px, 4vw, 42px); line-height: 1; font-weight: 950; letter-spacing: -0.045em; }
+    .period { color: var(--muted); font-size: 16px; font-weight: 800; }
+    .yearly { margin-top: 14px; display: inline-flex; width: fit-content; max-width: 100%; border-radius: 999px; padding: 8px 12px; background: var(--green-soft); border: 1px solid rgba(34,159,103,.16); color: var(--green-dark); font-size: 11px; font-weight: 950; }
+    .limits { margin-top: 24px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .limit-box { border-radius: 14px; border: 1px solid var(--line); background: var(--panel-soft); padding: 13px; }
+    .limit-label { color: var(--muted); font-size: 11px; font-weight: 850; }
+    .limit-value { margin-top: 5px; color: var(--text); font-size: 13px; font-weight: 850; }
+    .features { margin: 28px 0 30px; padding: 0; list-style: none; display: grid; gap: 14px; color: var(--muted); font-size: 13.5px; font-weight: 720; }
+    .features li { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; }
+    .check { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--green-soft); color: var(--green-dark); font-weight: 950; font-size: 13px; }
+    .btn {
+      margin-top: auto;
+      min-height: 50px;
+      display: inline-flex;
       align-items: center;
-      gap: 22px;
-      box-shadow: 0 24px 70px rgba(16, 37, 27, 0.18);
+      justify-content: center;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      border: 1px solid rgba(34,159,103,.16);
+      font-size: 14px;
+      font-weight: 950;
+      transition: 160ms ease;
     }
-    .cta h2 { margin: 0; font-size: clamp(26px, 4vw, 42px); letter-spacing: -0.04em; line-height: 1.05; }
-    .cta p { margin: 10px 0 0; color: rgba(255,255,255,0.72); font-weight: 600; }
-    .cta .btn { background: white; color: #10251b; }
-    .cta .btn:hover { background: #e9f6ef; }
+    .btn:hover { background: var(--green); color: white; }
+    .featured .btn { background: var(--green); color: white; box-shadow: 0 14px 30px rgba(34,159,103,.22); }
+    .featured .btn:hover { background: var(--green-dark); }
+    .trust { margin-top: 26px; display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .trust span { display: inline-flex; align-items: center; gap: 8px; }
+    .trust span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--green); opacity: .75; }
 
-    @media (max-width: 1040px) {
-      .hero { grid-template-columns: 1fr; align-items: start; }
-      .pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .gain { padding: 0 0 34px; }
+    .section-title { text-align: center; margin-bottom: 28px; }
+    .section-title h2 { margin: 0; font-size: clamp(28px, 3.4vw, 38px); font-weight: 950; letter-spacing: -0.04em; }
+    .gain-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; max-width: 1060px; margin: 0 auto; }
+    .gain-card { border-radius: 22px; border: 1px solid var(--line); background: rgba(255,255,255,.84); padding: 24px; box-shadow: 0 16px 44px rgba(18,52,34,.06); }
+    .gain-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .gain-icon { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: #10251b; color: white; font-weight: 950; }
+    .gain-no { color: #b7c8bd; font-size: 12px; font-weight: 950; letter-spacing: .12em; }
+    .gain-card h3 { margin: 0; font-size: 16px; font-weight: 900; }
+    .gain-card p { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; font-weight: 650; }
+
+    footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .footer-status { display: inline-flex; align-items: center; gap: 8px; }
+
+    @media (max-width: 980px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 620px; }
+      .price-card.featured { transform: none; }
+      .gain-grid { grid-template-columns: 1fr; max-width: 620px; }
     }
-
-    @media (max-width: 700px) {
-      .wrap { width: min(100% - 24px, 1180px); }
-      .nav { height: auto; padding: 14px 0; align-items: flex-start; flex-direction: column; }
-      .nav-actions { width: 100%; flex-wrap: wrap; }
-      .nav-actions .btn, .nav-actions .nav-link { flex: 1 1 auto; }
-      .hero { padding-top: 38px; gap: 22px; }
-      .hero-card { padding: 22px; border-radius: 20px; }
-      .section-head { align-items: flex-start; flex-direction: column; }
-      .pricing-grid { grid-template-columns: 1fr; }
-      .price-card { min-height: auto; }
-      .compare { overflow-x: auto; }
-      table { min-width: 720px; }
-      .cta { align-items: stretch; flex-direction: column; padding: 26px; }
-      .cta .btn { width: 100%; }
+    @media (max-width: 720px) {
+      .wrap { width: min(100% - 24px, 1240px); }
+      .brand-row { align-items: flex-start; flex-direction: column; }
+      .hero { padding-top: 30px; }
+      .photo-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .limits { grid-template-columns: 1fr; }
+      .price-card { min-height: auto; padding: 24px; }
+      .trust { align-items: flex-start; flex-direction: column; gap: 10px; }
+      .footer-row { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <main class="page">
+  <main>
     <header class="topbar">
-      <div class="wrap nav">
-        <a class="brand" href="/" aria-label="CiltGPT ana sayfa">
-          <span class="brand-mark">C</span>
-          <span>CİLTGPT</span>
+      <div class="wrap brand-row">
+        <a class="brand" href="/" aria-label="ciltGPT">
+          <span class="brand-mark">c</span>
+          <span>ciltGPT</span>
         </a>
-        <nav class="nav-actions" aria-label="Fiyatlar menüsü">
-          <a class="nav-link" href="/">Ana sayfa</a>
-          <a class="nav-link" href="#paketler">Paketler</a>
-          <a class="nav-link" href="#karsilastirma">Karşılaştırma</a>
-          <a class="btn btn-primary" href="/login" target="_blank" rel="noopener noreferrer">Giriş yap</a>
-        </nav>
+        <div class="status"><span class="dot"></span>Tüm salonlar için aktif</div>
       </div>
     </header>
 
     <section class="wrap hero">
-      <div>
-        <div class="eyebrow">Cilt Analiz Paneli</div>
-        <h1>Salonlar için net, yönetilebilir fiyatlar.</h1>
-        <p class="lead">CiltGPT paketleri analiz hacmine, ekip büyüklüğüne ve salon operasyonuna göre ölçeklenir. Telefon, tablet ve bilgisayardan kullanılabilir.</p>
+      <div class="pill">Günde 49 TL'ye Salonun İçin En İyi Ürün Satış Uzmanı</div>
+      <h1><span>Analiz Eder,</span><span>Önerir,</span><span>Sattırır</span></h1>
+      <div class="hero-subtitle">Cilt Analizinde <strong>Yapay Zeka Dönemi</strong> Başladı</div>
+      <div class="hero-note">4 fotoğrafla profesyonel analiz sistemi</div>
+      <div class="photo-grid" aria-label="Fotoğraf adımları">
+        <div class="photo-card"><div class="photo-icon">1</div><div class="photo-title">Ön Yüz</div><div class="photo-desc">Frontal</div></div>
+        <div class="photo-card"><div class="photo-icon">2</div><div class="photo-title">Sol Profil</div><div class="photo-desc">Left 45°</div></div>
+        <div class="photo-card"><div class="photo-icon">3</div><div class="photo-title">Sağ Profil</div><div class="photo-desc">Right 45°</div></div>
+        <div class="photo-card"><div class="photo-icon">4</div><div class="photo-title">Yakın Plan</div><div class="photo-desc">Macro Detail</div></div>
       </div>
-      <aside class="hero-card" aria-label="Öne çıkan fiyat bilgisi">
-        <div class="badge badge-amber">Günde yaklaşık 49 TL’den başlayan kullanım</div>
-        <p class="hero-price">790 TL <small>/ ay</small></p>
-        <ul class="hero-list">
-          <li><span class="check">✓</span><span>4 fotoğrafla kozmetik cilt analizi</span></li>
-          <li><span class="check">✓</span><span>Salon logolu rapor ve ürün öneri akışı</span></li>
-          <li><span class="check">✓</span><span>Yıllık ödemede 10 ay öde, 12 ay kullan</span></li>
-        </ul>
-      </aside>
+      <div class="camera-note">Telefon kamerası yeterli • Profesyonel kurulum gerektirmez</div>
     </section>
 
-    <section id="paketler" class="wrap section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Paketler</div>
-          <h2>İhtiyacına göre seç.</h2>
-        </div>
-        <div class="section-note">Tüm paketlerde temel rapor ekranı ve ürün öneri altyapısı bulunur.</div>
-      </div>
-
+    <section class="wrap pricing">
       <div class="pricing-grid">
         <article class="price-card">
-          <span class="badge">Başlangıç</span>
-          <h3 class="plan-title">Start</h3>
-          <p class="plan-price">790 TL <span>/ ay</span></p>
+          <div class="badge">Başlangıç</div>
+          <div class="price-line"><span class="price">790 TL</span><span class="period">/ ay</span></div>
+          <div class="yearly">Yıllıkta 10 AY ÖDE 12 AY KULLAN +2 AY HEDİYE</div>
           <div class="limits">
-            <div class="limit-box"><small>Analiz hakkı</small><strong>100 analiz / ay</strong></div>
-            <div class="limit-box"><small>Ekip</small><strong>1 kullanıcı</strong></div>
+            <div class="limit-box"><div class="limit-label">Analiz Hakkı</div><div class="limit-value">100 Analiz / Ay</div></div>
+            <div class="limit-box"><div class="limit-label">Ekip</div><div class="limit-value">1 Kullanıcı</div></div>
           </div>
           <ul class="features">
-            <li>✓ Temel analiz raporu</li>
-            <li>✓ Salon bilgileri ile rapor hazırlama</li>
-            <li>✓ Ürün öneri listesi</li>
-            <li>✓ Başlangıç seviyesi müşteri takibi</li>
+            <li><span class="check">✓</span><span>4 Açıdan AI Cilt Analizi (Ön Yüz + Sol/Sağ Profil + Yakın Plan)</span></li>
+            <li><span class="check">✓</span><span>Kişiye Özel Logolu PDF Rapor</span></li>
+            <li><span class="check">✓</span><span>Kendi Ürünlerini Sisteme Ekleme</span></li>
+            <li><span class="check">✓</span><span>WhatsApp ile Otomatik Rapor Gönderimi</span></li>
+            <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
+            <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn btn-soft" href="/login" target="_blank" rel="noopener noreferrer">Paketi seç</a>
+          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">Hemen Başla</a>
         </article>
 
         <article class="price-card featured">
-          <span class="badge">En çok tercih edilen</span>
-          <h3 class="plan-title">Pro</h3>
-          <p class="plan-price">1.490 TL <span>/ ay</span></p>
+          <div class="badge">En Çok Satan</div>
+          <div class="price-line"><span class="price">1.490 TL</span><span class="period">/ ay</span></div>
+          <div class="yearly">Yıllıkta 10 AY ÖDE 12 AY KULLAN +2 AY HEDİYE</div>
           <div class="limits">
-            <div class="limit-box"><small>Analiz hakkı</small><strong>300 analiz / ay</strong></div>
-            <div class="limit-box"><small>Ekip</small><strong>3 kullanıcı</strong></div>
+            <div class="limit-box"><div class="limit-label">Analiz Hakkı</div><div class="limit-value">300 Analiz / Ay</div></div>
+            <div class="limit-box"><div class="limit-label">Ekip</div><div class="limit-value">3 Kullanıcı</div></div>
           </div>
           <ul class="features">
-            <li>✓ Gelişmiş rapor ekranları</li>
-            <li>✓ Salon ürün yönetimi</li>
-            <li>✓ Müşteri CRM ve takip akışı</li>
-            <li>✓ PDF rapor indirme</li>
+            <li><span class="check">✓</span><span>4 Açıdan AI Cilt Analizi (Ön Yüz + Sol/Sağ Profil + Yakın Plan)</span></li>
+            <li><span class="check">✓</span><span>Kişiye Özel Logolu PDF Rapor</span></li>
+            <li><span class="check">✓</span><span>Kendi Ürünlerini Sisteme Ekleme</span></li>
+            <li><span class="check">✓</span><span>WhatsApp ile Otomatik Rapor Gönderimi</span></li>
+            <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
+            <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn btn-primary" href="/login" target="_blank" rel="noopener noreferrer">Pro ile başla</a>
+          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">En Çok Tercih Edilen</a>
         </article>
 
-        <article class="price-card">
-          <span class="badge">Yoğun salonlar</span>
-          <h3 class="plan-title">Elite</h3>
-          <p class="plan-price">4.990 TL <span>/ ay</span></p>
+        <article class="price-card elite">
+          <div class="badge">Yoğun Salonlar İçin</div>
+          <div class="price-line"><span class="price">4.990 TL</span><span class="period">/ ay</span></div>
+          <div class="yearly">Yıllıkta 10 AY ÖDE 12 AY KULLAN +2 AY HEDİYE</div>
           <div class="limits">
-            <div class="limit-box"><small>Analiz hakkı</small><strong>1000 analiz / ay</strong></div>
-            <div class="limit-box"><small>Ekip</small><strong>5 kullanıcı</strong></div>
+            <div class="limit-box"><div class="limit-label">Analiz Hakkı</div><div class="limit-value">1000 Analiz / Ay</div></div>
+            <div class="limit-box"><div class="limit-label">Ekip</div><div class="limit-value">5 Kullanıcı</div></div>
           </div>
           <ul class="features">
-            <li>✓ Yüksek analiz kapasitesi</li>
-            <li>✓ Gelişmiş müşteri takip ekranları</li>
-            <li>✓ Öncelikli destek</li>
-            <li>✓ Çoklu kullanıcı operasyonu</li>
+            <li><span class="check">✓</span><span>4 Açıdan AI Cilt Analizi (Ön Yüz + Sol/Sağ Profil + Yakın Plan)</span></li>
+            <li><span class="check">✓</span><span>Kişiye Özel Logolu PDF Rapor</span></li>
+            <li><span class="check">✓</span><span>Kendi Ürünlerini Sisteme Ekleme</span></li>
+            <li><span class="check">✓</span><span>WhatsApp ile Otomatik Rapor Gönderimi</span></li>
+            <li><span class="check">✓</span><span>Ev Bakım Ürün Önerisi & Akıllı Satış Takibi</span></li>
+            <li><span class="check">✓</span><span>Merkezi Müşteri Paneli & Geçmiş Takibi</span></li>
           </ul>
-          <a class="btn btn-soft" href="/login" target="_blank" rel="noopener noreferrer">Elite’e geç</a>
+          <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">Elite'e Geç</a>
         </article>
+      </div>
+      <div class="trust">
+        <span>İptal istediğin zaman</span>
+        <span>Kurulum 5 dakika</span>
+        <span>WhatsApp destek</span>
+      </div>
+    </section>
 
-        <article class="price-card">
-          <span class="badge badge-amber">Kurumsal</span>
-          <h3 class="plan-title">Enterprise</h3>
-          <p class="plan-price">Teklif al</p>
-          <div class="limits">
-            <div class="limit-box"><small>Analiz hakkı</small><strong>Özel limit</strong></div>
-            <div class="limit-box"><small>Ekip</small><strong>Özel kullanıcı limiti</strong></div>
-          </div>
-          <ul class="features">
-            <li>✓ Kurumsal kullanım planı</li>
-            <li>✓ Özel kurulum ve eğitim</li>
-            <li>✓ Marka / bayi operasyonu</li>
-            <li>✓ Özel destek süreci</li>
-          </ul>
-          <a class="btn btn-dark" href="/login" target="_blank" rel="noopener noreferrer">Teklif al</a>
+    <section class="wrap gain">
+      <div class="section-title"><h2>CiltGPT Salonuna Ne Kazandırır?</h2></div>
+      <div class="gain-grid">
+        <article class="gain-card">
+          <div class="gain-top"><div class="gain-icon">01</div><div class="gain-no">01</div></div>
+          <h3>Derin Analiz</h3>
+          <p>4 açıdan derin analiz, leke derinliğini yakın planda tespit eder</p>
+        </article>
+        <article class="gain-card">
+          <div class="gain-top"><div class="gain-icon">02</div><div class="gain-no">02</div></div>
+          <h3>Kişiye Özel Satış</h3>
+          <p>Kişiye özel rapor + senin ürünlerin otomatik önerilir</p>
+        </article>
+        <article class="gain-card">
+          <div class="gain-top"><div class="gain-icon">03</div><div class="gain-no">03</div></div>
+          <h3>Sadakat & Satış</h3>
+          <p>WhatsApp rapor sadakat ve ev devam satışını artırır</p>
         </article>
       </div>
     </section>
 
-    <section id="karsilastirma" class="wrap section">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">Karşılaştırma</div>
-          <h2>Paket kapsamı.</h2>
-        </div>
-        <div class="section-note">Yıllık ödemede 10 ay öde, 12 ay kullan seçeneği uygulanabilir.</div>
+    <footer>
+      <div class="wrap footer-row">
+        <span>© 2026 ciltGPT — Salonlar için AI cilt analizi</span>
+        <span class="footer-status"><span class="dot"></span>Sistem aktif • Tüm özellikler dahil</span>
       </div>
-      <div class="compare">
-        <table>
-          <thead>
-            <tr>
-              <th>Paket</th>
-              <th>Aylık fiyat</th>
-              <th>Analiz limiti</th>
-              <th>Kullanıcı</th>
-              <th>Öne çıkan kullanım</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Start</strong></td><td>790 TL / ay</td><td>100 analiz</td><td>1 kullanıcı</td><td>Yeni başlayan salonlar</td></tr>
-            <tr><td><strong>Pro</strong></td><td>1.490 TL / ay</td><td>300 analiz</td><td>3 kullanıcı</td><td>Aktif analiz ve satış akışı</td></tr>
-            <tr><td><strong>Elite</strong></td><td>4.990 TL / ay</td><td>1000 analiz</td><td>5 kullanıcı</td><td>Yoğun salon operasyonları</td></tr>
-            <tr><td><strong>Enterprise</strong></td><td>Teklif al</td><td>Özel limit</td><td>Özel limit</td><td>Firma, bayi ve zincir yapı</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="wrap cta">
-      <div>
-        <h2>Salon hesabına geçip paketi yönet.</h2>
-        <p>Giriş ekranı yeni sekmede açılır; mevcut sayfayı kapatmadan fiyatları incelemeye devam edebilirsin.</p>
-      </div>
-      <a class="btn" href="/login" target="_blank" rel="noopener noreferrer">Giriş yap</a>
-    </section>
+    </footer>
   </main>
 </body>
 </html>
