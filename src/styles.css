@@ -114,6 +114,35 @@ canvas {
   font-size: 12px;
 }
 
+.logo-brand {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand-wordmark {
+  display: block;
+  width: 136px;
+  height: auto;
+}
+
+.brand-subtitle {
+  display: block;
+  margin-top: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.auth-brand .brand-wordmark {
+  width: 158px;
+}
+
+.admin-sidebar .brand-wordmark {
+  width: 148px;
+}
+
 .admin-switch {
   display: flex;
   align-items: center;
@@ -2887,3 +2916,4 @@ details .customer-form {
     box-shadow: none;
   }
 }
+

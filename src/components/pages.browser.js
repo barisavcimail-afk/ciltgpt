@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const { customers, followUpCustomers, mockScores } = window.CiltGPTData;
   const { reports, protocol, aiComment } = window.CiltGPTReports;
   const products = window.CiltGPTProducts;
@@ -578,9 +578,9 @@
     return `
       <main class="auth-screen">
         <section class="auth-card">
-          <div class="brand auth-brand">
-            <span class="brand-mark">${isAdmin ? "A" : isFirm ? "F" : "C"}</span>
-            <span><strong>${title}</strong><small>${subtitle}</small></span>
+          <div class="brand auth-brand logo-brand">
+            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+            <small class="brand-subtitle">${subtitle}</small>
           </div>
           <div>
             <p class="eyebrow">${eyebrow}</p>
@@ -986,4 +986,5 @@
     placeholderPage,
   };
 })();
+
 

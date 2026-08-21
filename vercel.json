@@ -11,7 +11,8 @@
           "fiyatlar.html",
           "server.js",
           "src/**",
-          "prisma/**"
+          "prisma/**",
+          "assets/**"
         ]
       }
     }
@@ -23,5 +24,6 @@
     }
   ]
 }
+
 
 

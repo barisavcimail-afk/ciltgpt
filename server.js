@@ -52,6 +52,7 @@ const contentTypes = {
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
 };
 
 function sendJson(res, statusCode, payload) {
@@ -3429,6 +3430,7 @@ if (!process.env.VERCEL) {
     console.log(`CiltGPT SaaS MVP: http://localhost:${port}`);
   });
 }
+
 
 
 

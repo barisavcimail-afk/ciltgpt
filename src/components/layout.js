@@ -25,12 +25,9 @@ export function renderLayout(content, route) {
   return `
     <div class="shell">
       <aside class="sidebar">
-        <a class="brand" href="/dashboard" data-link>
-          <span class="brand-mark">C</span>
-          <span>
-            <strong>CiltGPT</strong>
-            <small>SaaS MVP</small>
-          </span>
+        <a class="brand logo-brand" href="/dashboard" data-link>
+          <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+          <small class="brand-subtitle">SaaS MVP</small>
         </a>
         <nav>${nav}</nav>
       </aside>
@@ -53,3 +50,4 @@ export function pageHeader(title, description, action = "") {
     </div>
   `;
 }
+

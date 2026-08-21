@@ -86,9 +86,9 @@
         </button>
         <div class="mobile-menu-backdrop" data-mobile-menu-close></div>
         <aside class="sidebar">
-          <a class="brand" href="${toHref("/dashboard")}" data-path="/dashboard">
-            <span class="brand-mark">C</span>
-            <span><strong>CiltGPT</strong><small>SaaS MVP</small></span>
+          <a class="brand logo-brand" href="${toHref("/dashboard")}" data-path="/dashboard">
+            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+            <small class="brand-subtitle">SaaS MVP</small>
           </a>
           <nav>${nav}</nav>
           <div class="sidebar-user-card">

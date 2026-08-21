@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const adminNav = [
     { label: "Genel Bakış", path: "/admin" },
     { label: "Salonlar", path: "/admin/salons" },
@@ -19,9 +19,9 @@
 
     return `
       <aside class="sidebar admin-sidebar">
-        <a class="brand" href="${toHref("/admin")}" data-path="/admin">
-          <span class="brand-mark admin-mark">A</span>
-          <span><strong>CiltGPT Admin</strong><small>Platform yönetimi</small></span>
+        <a class="brand logo-brand" href="${toHref("/admin")}" data-path="/admin">
+          <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+          <small class="brand-subtitle">Admin • Platform yönetimi</small>
         </a>
         <nav>${nav}</nav>
         <button class="admin-back-link" type="button" data-logout>Çıkış yap</button>
@@ -150,4 +150,5 @@
     AdminSettingsForm,
   };
 })();
+
 

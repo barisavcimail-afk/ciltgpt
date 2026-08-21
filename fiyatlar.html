@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CİLTGPT</title>
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <style>
     :root {
       --ink: #0f172a;
@@ -46,6 +48,7 @@
     }
     .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: -0.025em; font-size: 19px; }
     .brand-mark { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: #fff; background: var(--ink); font-size: 14px; font-weight: 900; }
+    .brand-wordmark { display:block; width:128px; height:auto; }
     .nav-left { display: flex; align-items: center; gap: 34px; min-width: 0; }
     .nav-links { display: flex; align-items: center; gap: 28px; color: #525866; font-size: 13.5px; font-weight: 650; white-space: nowrap; }
     .nav-links a:hover { color: var(--ink); }
@@ -232,8 +235,7 @@
     <div class="wrap nav">
       <div class="nav-left">
         <a class="brand" href="/" aria-label="CiltGPT Ana Sayfa">
-          <span class="brand-mark">c</span>
-          <span>CiltGPT</span>
+          <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
         </a>
         <nav class="nav-links" aria-label="Ana menü">
           <a href="/#nasil-calisir">Nasıl Çalışır?</a>
@@ -356,6 +358,7 @@
   </footer>
 </body>
 </html>
+
 
 
 
