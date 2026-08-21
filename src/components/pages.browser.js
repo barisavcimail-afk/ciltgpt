@@ -592,7 +592,7 @@
         <section class="auth-shell">
           <aside class="auth-showcase" aria-label="CiltGPT tanıtım alanı">
             <a class="brand auth-showcase-brand logo-brand" href="/" data-path="/">
-              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-2" alt="CiltGPT" />
+              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-3" alt="CiltGPT" />
               <small class="brand-subtitle">${subtitle}</small>
             </a>
             <div class="auth-copy">
@@ -619,7 +619,7 @@
 
           <section class="auth-card">
             <div class="brand auth-brand logo-brand">
-              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-2" alt="CiltGPT" />
+              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-3" alt="CiltGPT" />
               <small class="brand-subtitle">${subtitle}</small>
             </div>
             <div class="auth-card-heading">
@@ -1027,6 +1027,7 @@
     placeholderPage,
   };
 })();
+
 
 
 
