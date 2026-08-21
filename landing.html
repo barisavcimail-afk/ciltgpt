@@ -57,6 +57,11 @@ Error generating stack: `+u.message+`
     var target = event.target && event.target.closest ? event.target.closest("a,button") : null;
     if (!target) return;
     var text = (target.textContent || "").replace(/\s+/g, " ").trim().toLocaleLowerCase("tr-TR");
+    if (text === "fiyatlar" || text.includes("fiyatlar")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return go("/fiyatlar");
+    }
     if (
       text.includes("giriş yap") ||
       text.includes("giris yap") ||
@@ -80,6 +85,7 @@ Error generating stack: `+u.message+`
 </script>
 </body>
 </html>
+
 
 
 
