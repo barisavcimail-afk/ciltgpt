@@ -122,7 +122,7 @@ canvas {
 
 .brand-wordmark {
   display: block;
-  width: 172px;
+  width: 344px;
   height: auto;
 }
 
@@ -136,11 +136,11 @@ canvas {
 }
 
 .auth-brand .brand-wordmark {
-  width: 194px;
+  width: 388px;
 }
 
 .admin-sidebar .brand-wordmark {
-  width: 184px;
+  width: 368px;
 }
 
 .admin-switch {
@@ -220,7 +220,7 @@ canvas {
 }
 
 .auth-showcase-brand .brand-wordmark {
-  width: 190px;
+  width: 380px;
 }
 
 .auth-copy {
@@ -3191,6 +3191,7 @@ details .customer-form {
     box-shadow: none;
   }
 }
+
 
 
 
