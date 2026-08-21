@@ -20,7 +20,7 @@
     return `
       <aside class="sidebar admin-sidebar">
         <a class="brand logo-brand" href="${toHref("/admin")}" data-path="/admin">
-          <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+          <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-1" alt="CiltGPT" />
           <small class="brand-subtitle">Admin • Platform yönetimi</small>
         </a>
         <nav>${nav}</nav>
@@ -150,5 +150,6 @@
     AdminSettingsForm,
   };
 })();
+
 
 

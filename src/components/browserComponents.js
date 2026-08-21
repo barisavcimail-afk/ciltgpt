@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const icons = {
     dashboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h7V4H4v9Zm0 7h7v-5H4v5Zm9 0h7v-9h-7v9Zm0-16v5h7V4h-7Z"/></svg>',
     customers: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3ZM8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>',
@@ -87,7 +87,7 @@
         <div class="mobile-menu-backdrop" data-mobile-menu-close></div>
         <aside class="sidebar">
           <a class="brand logo-brand" href="${toHref("/dashboard")}" data-path="/dashboard">
-            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg" alt="CiltGPT" />
+            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-1" alt="CiltGPT" />
             <small class="brand-subtitle">SaaS MVP</small>
           </a>
           <nav>${nav}</nav>
@@ -155,4 +155,5 @@
     customerFields,
   };
 })();
+
 
