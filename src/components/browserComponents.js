@@ -87,7 +87,7 @@
         <div class="mobile-menu-backdrop" data-mobile-menu-close></div>
         <aside class="sidebar">
           <a class="brand logo-brand" href="${toHref("/dashboard")}" data-path="/dashboard">
-            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-1" alt="CiltGPT" />
+            <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-2" alt="CiltGPT" />
             <small class="brand-subtitle">SaaS MVP</small>
           </a>
           <nav>${nav}</nav>
@@ -155,5 +155,6 @@
     customerFields,
   };
 })();
+
 
 
