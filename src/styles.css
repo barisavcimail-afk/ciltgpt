@@ -165,38 +165,32 @@ canvas {
 
 .auth-screen {
   min-height: 100vh;
-  padding: 32px;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(31, 157, 99, 0.12), transparent 28%),
-    radial-gradient(circle at 82% 18%, rgba(19, 117, 71, 0.08), transparent 30%),
-    linear-gradient(180deg, #f7fbf8 0%, #eef6f1 100%);
+  padding: 0;
+  background: #fff;
 }
 
 .auth-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(380px, 480px);
-  gap: 28px;
-  width: min(1180px, 100%);
-  min-height: calc(100vh - 64px);
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 52%) minmax(420px, 48%);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
   align-items: stretch;
-}
-
-.auth-showcase,
-.auth-card {
-  border: 1px solid rgba(31, 157, 99, 0.14);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 24px 70px rgba(27, 45, 36, 0.1);
 }
 
 .auth-showcase {
   position: relative;
   display: flex;
+  min-height: 100vh;
   flex-direction: column;
+  justify-content: center;
   gap: 28px;
   overflow: hidden;
-  padding: 34px;
+  padding: clamp(32px, 5vw, 72px);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(31, 157, 99, 0.22), transparent 30%),
+    radial-gradient(circle at 86% 26%, rgba(19, 117, 71, 0.14), transparent 32%),
+    linear-gradient(135deg, #f7fbf8 0%, #eef8f2 52%, #e4f4ec 100%);
 }
 
 .auth-showcase::before {
@@ -204,37 +198,48 @@ canvas {
   inset: 0;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(31, 157, 99, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(31, 157, 99, 0.055) 1px, transparent 1px);
-  background-size: 42px 42px;
+    linear-gradient(rgba(19, 117, 71, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(19, 117, 71, 0.07) 1px, transparent 1px);
+  background-size: 46px 46px;
   content: "";
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.74), rgba(0, 0, 0, 0.2));
 }
 
 .auth-showcase > * {
   position: relative;
   z-index: 1;
+  width: min(620px, 100%);
 }
 
 .auth-showcase-brand {
-  margin-bottom: 18px;
+  position: absolute;
+  top: clamp(24px, 4vw, 42px);
+  left: clamp(28px, 5vw, 72px);
+  width: auto;
+  margin: 0;
+}
+
+.auth-showcase-brand .brand-wordmark {
+  width: 146px;
 }
 
 .auth-copy {
-  max-width: 640px;
+  max-width: 680px;
 }
 
 .auth-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 18px;
-  padding: 8px 13px;
-  border: 1px solid rgba(31, 157, 99, 0.16);
+  margin: 0 0 22px;
+  padding: 8px 14px;
+  border: 1px solid rgba(19, 117, 71, 0.16);
   border-radius: 999px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.76);
   color: var(--green-dark);
   font-size: 13px;
   font-weight: 850;
+  box-shadow: 0 10px 30px rgba(27, 45, 36, 0.05);
 }
 
 .auth-pill span {
@@ -245,30 +250,32 @@ canvas {
 }
 
 .auth-copy h1 {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0;
   color: #101b16;
-  font-size: clamp(44px, 6.8vw, 82px);
+  font-size: clamp(56px, 7vw, 96px);
   font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.98;
+  line-height: 0.94;
 }
 
 .auth-copy p:not(.auth-pill) {
-  max-width: 520px;
-  margin: 22px 0 0;
-  color: var(--muted);
-  font-size: 17px;
+  max-width: 560px;
+  margin: 24px 0 0;
+  color: #50665c;
+  font-size: 18px;
   font-weight: 650;
   line-height: 1.65;
 }
 
 .auth-visual-card {
-  margin-top: auto;
-  padding: 22px;
-  border: 1px solid rgba(31, 157, 99, 0.14);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.74);
+  margin-top: 10px;
+  padding: 20px;
+  border: 1px solid rgba(19, 117, 71, 0.14);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 60px rgba(27, 45, 36, 0.08);
+  backdrop-filter: blur(12px);
 }
 
 .auth-visual-top {
@@ -288,6 +295,7 @@ canvas {
   align-items: center;
   min-height: 26px;
   padding: 0 11px;
+  border: 1px solid rgba(31, 157, 99, 0.18);
   border-radius: 999px;
   background: var(--green-soft);
   color: var(--green-dark);
@@ -296,19 +304,19 @@ canvas {
 
 .auth-photo-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .auth-photo-grid article {
   display: grid;
-  min-height: 118px;
+  min-height: 134px;
   place-items: center;
   align-content: center;
   gap: 7px;
-  border: 1px dashed rgba(31, 157, 99, 0.28);
+  border: 1px dashed rgba(19, 117, 71, 0.24);
   border-radius: 18px;
-  background: #fbfdfb;
+  background: rgba(255, 255, 255, 0.68);
   text-align: center;
 }
 
@@ -331,9 +339,9 @@ canvas {
 
 .auth-metrics article {
   padding: 14px;
-  border: 1px solid rgba(31, 157, 99, 0.12);
+  border: 1px solid rgba(19, 117, 71, 0.12);
   border-radius: 18px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .auth-metrics strong,
@@ -355,22 +363,33 @@ canvas {
 }
 
 .auth-card {
-  align-self: center;
-  display: grid;
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
   gap: 22px;
-  padding: 30px;
+  padding: clamp(32px, 6vw, 86px);
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.auth-card > * {
+  width: min(430px, 100%);
 }
 
 .auth-brand {
   min-height: auto;
-  margin-bottom: 0;
+  margin-bottom: 4px;
   padding: 0;
 }
 
 .auth-card-heading h2 {
   margin: 6px 0 8px;
   color: var(--text);
-  font-size: 30px;
+  font-size: 32px;
   line-height: 1.12;
 }
 
@@ -387,13 +406,14 @@ canvas {
 
 .auth-form input {
   min-height: 52px;
-  border-radius: 16px;
+  border-radius: 999px;
   background: #fbfdfb;
 }
 
 .auth-submit {
   min-height: 52px;
   margin-top: 2px;
+  border-radius: 999px;
 }
 
 .password-field {
@@ -414,7 +434,7 @@ canvas {
   height: 34px;
   place-items: center;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 999px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
@@ -2799,16 +2819,17 @@ details .customer-form {
 
 @media (max-width: 980px) {
   .auth-screen {
-    padding: 18px;
+    padding: 0;
   }
 
   .auth-shell {
     grid-template-columns: 1fr;
-    min-height: auto;
+    min-height: 100vh;
   }
 
   .auth-showcase {
-    padding: 26px;
+    min-height: auto;
+    padding: 96px 26px 30px;
   }
 
   .auth-copy h1 {
@@ -2820,27 +2841,37 @@ details .customer-form {
   }
 
   .auth-card {
+    min-height: auto;
     align-self: stretch;
   }
 }
 @media (max-width: 640px) {
   .auth-screen {
-    padding: 12px;
+    padding: 0;
   }
 
   .auth-showcase,
   .auth-card {
-    padding: 20px;
-    border-radius: 18px;
+    border-radius: 0;
   }
 
   .auth-showcase {
     gap: 20px;
+    padding: 86px 20px 24px;
+  }
+
+  .auth-card {
+    padding: 28px 20px;
+  }
+
+  .auth-showcase-brand {
+    top: 22px;
+    left: 20px;
   }
 
   .auth-copy h1 {
-    font-size: 38px;
-    line-height: 1.02;
+    font-size: 40px;
+    line-height: 0.98;
   }
 
   .auth-copy p:not(.auth-pill) {
@@ -2859,8 +2890,7 @@ details .customer-form {
   .auth-card-heading h2 {
     font-size: 25px;
   }
-
-  .page-header {
+.page-header {
     align-items: flex-start;
     flex-direction: column;
     gap: 14px;
@@ -3161,6 +3191,7 @@ details .customer-form {
     box-shadow: none;
   }
 }
+
 
 
 
