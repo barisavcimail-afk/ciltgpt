@@ -618,12 +618,7 @@
           </aside>
 
           <section class="auth-card">
-            <div class="brand auth-brand logo-brand">
-              <img class="brand-wordmark" src="/assets/ciltgpt-logo.svg?v=20260821-4" alt="CiltGPT" />
-              <small class="brand-subtitle">${subtitle}</small>
-            </div>
-            <div class="auth-card-heading">
-              <p class="eyebrow">${eyebrow}</p>
+            <div class="auth-card-heading compact">
               <h2>${heading}</h2>
               <p>${formTitle} bilgilerinizi girerek devam edin.</p>
             </div>
@@ -1027,6 +1022,7 @@
     placeholderPage,
   };
 })();
+
 
 
 
