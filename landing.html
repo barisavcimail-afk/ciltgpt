@@ -26,7 +26,11 @@ Error generating stack: `+u.message+`
   
 <script>
 (function () {
-  function go(path) {
+  function go(path, target) {
+    if (target === "_blank") {
+      window.open(path, "_blank", "noopener,noreferrer");
+      return;
+    }
     window.location.href = path;
   }
 
@@ -69,10 +73,12 @@ Error generating stack: `+u.message+`
       event.stopImmediatePropagation();
       if (text.includes("admin")) return go("/admin-login");
       if (text.includes("firma")) return go("/firm-login");
-      return go("/login");
+      return go("/login", "_blank");
     }
   }, true);
 })();
 </script>
 </body>
 </html>
+
+
