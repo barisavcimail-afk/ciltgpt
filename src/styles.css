@@ -3387,23 +3387,32 @@ details .customer-form {
   }
 
   .wizard-progress {
-    display: flex;
-    gap: 8px;
-    margin: 0 -12px;
-    padding: 0 12px 4px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    display: block;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
   }
 
   .wizard-step {
-    flex: 0 0 144px;
-    min-height: 72px;
-    border-radius: 18px;
-    scroll-snap-align: start;
+    display: none;
   }
 
-  .wizard-step strong {
-    font-size: 12px;
+  .wizard-step.active {
+    display: flex;
+    width: 100%;
+    min-height: 58px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    text-align: center;
+  }
+
+  .wizard-step.active span {
+    display: none;
+  }
+
+  .wizard-step.active strong {
+    font-size: 16px;
   }
 
   .customer-search-box,
@@ -3546,10 +3555,6 @@ details .customer-form {
   .panel {
     padding: 14px;
     border-radius: 16px;
-  }
-
-  .wizard-step {
-    flex-basis: 132px;
   }
 
   .table-wrap table,
