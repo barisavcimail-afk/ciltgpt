@@ -2696,7 +2696,7 @@ details .customer-form {
   .mobile-menu-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 70;
+    z-index: 1100;
     display: none;
     background: rgba(0, 0, 0, 0.5);
   }
@@ -2705,10 +2705,14 @@ details .customer-form {
     display: block;
   }
 
+  .mobile-menu-open .mobile-menu-toggle {
+    z-index: 1120;
+  }
+
   .sidebar {
     position: fixed;
     inset: 0 auto 0 0;
-    z-index: 75;
+    z-index: 1110;
     width: min(82vw, 300px);
     height: 100vh;
     padding: 76px 16px 16px;
