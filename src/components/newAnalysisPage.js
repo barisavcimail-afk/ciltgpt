@@ -52,7 +52,7 @@ export function newAnalysisPage() {
               .map(
                 (field) => `
                   <label class="upload-box">
-                    <input type="file" accept="image/*" aria-label="${field}" />
+                    <input type="file" accept="image/*" capture="user" aria-label="${field}" />
                     <strong>${field}</strong>
                     <span>Fotoğraf seç</span>
                   </label>
@@ -74,3 +74,4 @@ export function newAnalysisPage() {
     </form>
   `;
 }
+

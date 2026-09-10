@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   const { customers } = window.CiltGPTData;
   const { pageHeader, customerFields } = window.CiltGPTComponents;
   window.CiltGPTSubscription = window.CiltGPTSubscription || { packages: [], currentSubscription: {}, usageStats: {} };
@@ -286,7 +286,7 @@
               const preview = typeof photo === "string" ? "" : photo.preview || "";
               return `
                 <label class="upload-box ${fileName ? "uploaded" : ""}">
-                  <input type="file" accept="image/*" data-photo-key="${field.key}" aria-label="${field.label}" />
+                  <input type="file" accept="image/*" capture="user" data-photo-key="${field.key}" aria-label="${field.label}" />
                   ${preview ? `<img class="upload-preview" src="${preview}" alt="${field.label} önizleme" />` : ""}
                   <strong>${field.label}</strong>
                   <span>${fileName || "Fotoğraf seç"}</span>
@@ -801,4 +801,5 @@
     selectedCustomer,
   };
 })();
+
 
