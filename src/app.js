@@ -188,10 +188,11 @@
   function customerRow(customer) {
     const detailPath = `/dashboard/customers/${customer.id}`;
     const reportPath = "/dashboard/reports";
+    const isInactive = customer.isActive === false || ["pasif", "inactive", "passive"].includes(String(customer.status || "").toLocaleLowerCase("tr-TR"));
 
     return `
       <tr>
-        <td>${escapeHtml(customer.fullName)}</td>
+        <td class="${isInactive ? "customer-name-inactive" : ""}">${escapeHtml(customer.fullName)}</td>
         <td>${escapeHtml(customer.phone)}</td>
         <td>${escapeHtml(customer.age || "-")}</td>
         <td>${escapeHtml(customer.gender || "-")}</td>
