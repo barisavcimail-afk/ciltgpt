@@ -3433,14 +3433,26 @@ details .customer-form {
 
   .customer-search-box,
   .report-customer-filter {
+    position: relative;
     max-width: none;
     grid-template-columns: 1fr;
   }
 
+  .customer-search-box [data-customer-search-results],
+  .report-customer-filter > .customer-search-results {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 90;
+    margin: 0;
+  }
+
   .customer-search-results,
   [data-customer-search-results] .customer-search-results {
-    max-height: 320px;
+    max-height: min(240px, 30dvh);
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .customer-search-result,
