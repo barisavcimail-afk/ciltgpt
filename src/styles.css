@@ -3306,7 +3306,6 @@ details .customer-form {
 
   .section-actions,
   .admin-action-bar,
-  .wizard-reset-row,
   .settings-actions,
   .report-actions,
   .modal-actions {
@@ -3316,12 +3315,26 @@ details .customer-form {
     gap: 10px;
   }
 
+  .wizard-reset-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 10px;
+  }
+
+  .wizard-reset-row .button {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 15px;
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+
   .button,
   .table-action,
   .admin-action-bar .button,
   .section-actions .button,
   .page-header .button,
-  .wizard-reset-row .button,
   .settings-actions .button,
   .report-actions .button {
     width: 100%;
