@@ -3,6 +3,7 @@
   const { pageHeader, customerFields } = window.CiltGPTComponents;
   window.CiltGPTSubscription = window.CiltGPTSubscription || { packages: [], currentSubscription: {}, usageStats: {} };
   const usageStats = window.CiltGPTSubscription.usageStats || {};
+  let analysisInProgress = false;
 
   const steps = [
     "Müşteri Seçimi",
@@ -397,7 +398,7 @@
           <button class="button ghost" type="button" data-wizard-prev ${state.step === 0 ? "disabled" : ""}>Geri</button>
           ${
             state.step === steps.length - 1
-              ? `<button class="button large" type="button" data-start-analysis ${isLimitReached || hasNoCustomers ? "disabled" : ""}>Analizi Başlat</button>`
+              ? `<button class="button large" type="button" data-start-analysis aria-live="polite" aria-busy="${analysisInProgress}" ${analysisInProgress || isLimitReached || hasNoCustomers ? "disabled" : ""}>${analysisInProgress ? "Analiz yapılıyor…" : "Analizi Başlat"}</button>`
               : `<button class="button large" type="button" data-wizard-next ${hasNoCustomers ? "disabled" : ""}>Devam</button>`
           }
         </div>
@@ -728,6 +729,7 @@
     const start = form.querySelector("[data-start-analysis]");
     if (start) {
       start.addEventListener("click", async () => {
+        if (analysisInProgress) return;
         const usage = getState().subscription?.usage || window.CiltGPTSubscription.usageStats;
         if (usage.remainingAnalyses <= 0) {
           setState({ warning: "Bu ayki analiz limitiniz dolmuştur. Paketinizi yükseltin." });
@@ -750,7 +752,10 @@
         }
 
         try {
+          analysisInProgress = true;
           start.disabled = true;
+          start.textContent = "Analiz yapılıyor…";
+          start.setAttribute("aria-busy", "true");
           const response = await fetch("/api/analyses", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -785,11 +790,15 @@
           sessionStorage.setItem("latestAnalysisReport", JSON.stringify(payload.report));
           navigate(`/dashboard/reports/${payload.reportId}`);
         } catch (error) {
+          analysisInProgress = false;
           console.error(error);
           setState({ warning: error instanceof Error ? error.message : "Analiz oluşturulurken bir hata oluştu." });
           window.CiltGPTRender();
         } finally {
+          analysisInProgress = false;
           start.disabled = false;
+          start.textContent = "Analizi Başlat";
+          start.setAttribute("aria-busy", "false");
         }
       });
     }

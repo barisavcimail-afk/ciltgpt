@@ -3148,6 +3148,66 @@ details .customer-form {
   }
 }
 
+@media (max-width: 780px) {
+  .dashboard-list-grid .table-wrap {
+    overflow: visible;
+  }
+
+  .dashboard-list-grid .table-wrap table,
+  .dashboard-list-grid tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-list-grid thead {
+    display: none;
+  }
+
+  .dashboard-list-grid tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dashboard-list-grid tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .dashboard-list-grid td {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-list-grid td:first-child {
+    grid-column: 1 / -1;
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  .dashboard-list-grid td:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-list-grid .table-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 44px;
+    width: 100%;
+  }
+
+  #dashboard-latest-analyses td:nth-child(4)::before {
+    content: "Skor: ";
+    color: var(--muted);
+  }
+}
+
 /* Mobile app shell polish */
 @media (max-width: 780px) {
   :root {
