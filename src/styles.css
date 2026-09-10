@@ -575,7 +575,8 @@ canvas {
 }
 
 .mobile-menu-toggle,
-.mobile-menu-backdrop {
+.mobile-menu-backdrop,
+.mobile-top-logo {
   display: none;
 }
 
@@ -3160,9 +3161,32 @@ details .customer-form {
     min-height: 100svh;
   }
 
+  .mobile-top-logo {
+    position: fixed;
+    top: calc(11px + env(safe-area-inset-top));
+    left: 12px;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    height: 42px;
+    padding: 0 10px;
+    border: 1px solid rgba(31, 157, 99, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 10px 24px rgba(20, 47, 34, 0.08);
+    backdrop-filter: blur(14px);
+  }
+
+  .mobile-top-logo img {
+    display: block;
+    width: 124px;
+    height: auto;
+  }
+
   .mobile-menu-toggle {
     top: calc(10px + env(safe-area-inset-top));
-    left: 12px;
+    right: 12px;
+    left: auto;
     width: 44px;
     height: 44px;
     border-color: rgba(31, 157, 99, 0.18);

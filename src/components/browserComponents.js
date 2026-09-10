@@ -81,6 +81,7 @@
 
     return `
       <div class="shell">
+        <a class="mobile-top-logo" href="${toHref("/dashboard")}" data-path="/dashboard"><img src="/assets/ciltgpt-logo.svg?v=20260821-4" alt="CiltGPT" /></a>
         <button class="mobile-menu-toggle" type="button" data-mobile-menu-toggle aria-label="Menüyü aç" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
