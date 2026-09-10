@@ -3400,32 +3400,7 @@ details .customer-form {
   }
 
   .wizard-progress {
-    display: block;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-  }
-
-  .wizard-step {
     display: none;
-  }
-
-  .wizard-step.active {
-    display: flex;
-    width: 100%;
-    min-height: 58px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px;
-    text-align: center;
-  }
-
-  .wizard-step.active span {
-    display: none;
-  }
-
-  .wizard-step.active strong {
-    font-size: 16px;
   }
 
   .customer-search-box,
