@@ -849,7 +849,13 @@
     return `
       ${pageHeader("Müşteriler", "Analiz yapılacak salon müşterilerini takip edin ve yeni müşteri ekleyin.")}
       <section class="panel">
-        <div class="section-title"><h2>Müşteri listesi</h2><span class="muted" id="customers-count">Yükleniyor</span></div>
+        <div class="section-title">
+          <h2>Müşteri listesi</h2>
+          <div class="section-actions">
+            <span class="muted" id="customers-count">Yükleniyor</span>
+            <button class="button" type="button" data-open-customers-modal>Yeni müşteri ekle</button>
+          </div>
+        </div>
         <div id="customers-api-message" class="success-message error-message" hidden></div>
         <div id="customers-empty-state" class="empty-state" hidden>
           <h2>Hen&uuml;z m&uuml;&#351;teri kayd&#305; yok.</h2>
