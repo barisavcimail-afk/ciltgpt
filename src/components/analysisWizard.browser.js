@@ -289,7 +289,7 @@
                   <input type="file" accept="image/*" capture="user" data-photo-key="${field.key}" aria-label="${field.label}" />
                   ${preview ? `<img class="upload-preview" src="${preview}" alt="${field.label} önizleme" />` : ""}
                   <strong>${field.label}</strong>
-                  <span>${fileName || "Fotoğraf seç"}</span>
+                  <span>${fileName || "Fotoğraf çek"}</span>
                   ${fileName ? "<em>Yüklendi</em>" : ""}
                 </label>
               `;

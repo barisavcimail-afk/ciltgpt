@@ -54,7 +54,7 @@ export function newAnalysisPage() {
                   <label class="upload-box">
                     <input type="file" accept="image/*" capture="user" aria-label="${field}" />
                     <strong>${field}</strong>
-                    <span>Fotoğraf seç</span>
+                    <span>Fotoğraf çek</span>
                   </label>
                 `,
               )
