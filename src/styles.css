@@ -3237,6 +3237,108 @@ details .customer-form {
   }
 }
 
+@media (max-width: 780px) {
+  #customers-table-wrap {
+    overflow: visible;
+  }
+
+  #customers-table-wrap table,
+  #customers-table-body {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #customers-table-wrap thead {
+    display: none;
+  }
+
+  #customers-table-body tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+
+  #customers-table-body tr:last-child {
+    border-bottom: 0;
+  }
+
+  #customers-table-body td {
+    padding: 0;
+    min-width: 0;
+    border: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #customers-table-body td:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  #customers-table-body td:nth-child(6) {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  #customers-table-body td:nth-child(2),
+  #customers-table-body td:nth-child(5),
+  #customers-table-body td:last-child,
+  #customers-table-body td[colspan] {
+    grid-column: 1 / -1;
+  }
+
+  #customers-table-body td:nth-child(3)::before {
+    content: "Yaş: ";
+    color: var(--muted);
+  }
+
+  #customers-table-body td:nth-child(4)::before {
+    content: "Cinsiyet: ";
+    color: var(--muted);
+  }
+
+  #customers-table-body td:nth-child(5)::before {
+    content: "Son analiz: ";
+    color: var(--muted);
+  }
+
+  #customers-table-body .table-action-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  #customers-table-body .table-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    width: 100%;
+  }
+
+  #customers-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  #customers-pagination .pagination-pages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    max-width: 100%;
+  }
+}
+
 /* Mobile app shell polish */
 @media (max-width: 780px) {
   :root {
