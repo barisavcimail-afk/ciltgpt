@@ -3163,24 +3163,24 @@ details .customer-form {
 
   .mobile-top-logo {
     position: fixed;
-    top: calc(11px + env(safe-area-inset-top));
-    left: 12px;
+    top: calc(10px + env(safe-area-inset-top));
+    left: max(16px, env(safe-area-inset-left));
     z-index: 80;
     display: flex;
     align-items: center;
-    height: 42px;
-    padding: 0 10px;
-    border: 1px solid rgba(31, 157, 99, 0.12);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 10px 24px rgba(20, 47, 34, 0.08);
-    backdrop-filter: blur(14px);
+    width: 190px;
+    max-width: calc(100vw - 88px);
+    height: 44px;
+    padding: 0;
+    background: transparent;
   }
 
   .mobile-top-logo img {
     display: block;
-    width: 124px;
-    height: auto;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: left center;
   }
 
   .mobile-menu-toggle {
